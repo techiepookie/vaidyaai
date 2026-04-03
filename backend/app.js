@@ -44,16 +44,18 @@ function createApp() {
     hsts: { maxAge: 31536000, includeSubDomains: true, preload: true },
   }));
 
-  // ── CORS — only allow Firebase Hosting origin ─────────────────
-  const allowedOrigins = (process.env.ALLOWED_ORIGINS || '')
-    .split(',')
-    .map(o => o.trim())
-    .filter(Boolean);
+  // ── CORS — allow Firebase Hosting + local dev origins ───────────
+  const allowedOrigins = [
+    ...(process.env.ALLOWED_ORIGINS || '').split(',').map(o => o.trim()).filter(Boolean),
+    'http://localhost:3000',
+    'http://localhost:5000',
+    'http://127.0.0.1:3000',
+  ];
 
   app.use(cors({
     origin: (origin, cb) => {
       // Allow server-to-server (no origin) and configured origins
-      if (!origin || allowedOrigins.includes(origin) || process.env.NODE_ENV === 'test') {
+      if (!origin || allowedOrigins.includes(origin) || process.env.NODE_ENV !== 'production') {
         cb(null, true);
       } else {
         cb(new Error(`CORS: origin ${origin} not allowed`));
@@ -82,6 +84,11 @@ function createApp() {
     standardHeaders: true,
     legacyHeaders: false,
     message: { error: 'AI rate limit exceeded. Please wait before submitting again.' },
+  });
+
+  // ── Root — redirect to health check ─────────────────────────
+  app.get('/', (_req, res) => {
+    res.redirect('/health');
   });
 
   // ── Health check (no auth required) ───────────────────────────

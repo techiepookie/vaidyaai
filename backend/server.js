@@ -15,15 +15,32 @@
  *   NODE_ENV               - 'production' | 'development' | 'test'
  */
 
-require('dotenv').config(); // local dev only; no-op in Cloud Run (env vars injected)
+// Load .env for local development (ignored in Cloud Run where env vars are injected)
+try { require('dotenv').config(); } catch { /* dotenv not installed — ok in production */ }
+
+// Log ALL uncaught errors — critical for Cloud Run crash diagnosis
+process.on('uncaughtException', (err) => {
+  console.error('[VaidyaAI] UNCAUGHT EXCEPTION:', err.message);
+  console.error(err.stack);
+  process.exit(1);
+});
+process.on('unhandledRejection', (reason) => {
+  console.error('[VaidyaAI] UNHANDLED REJECTION:', reason);
+  process.exit(1);
+});
 
 const { createApp } = require('./app');
 
-const PORT = process.env.PORT || 8080;
+const PORT = parseInt(process.env.PORT, 10) || 8080;
 const app  = createApp();
 
-app.listen(PORT, () => {
-  // Avoid logging sensitive env vars
+const server = app.listen(PORT, '0.0.0.0', () => {
   console.log(`[VaidyaAI] Backend listening on port ${PORT}`);
   console.log(`[VaidyaAI] NODE_ENV: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`[VaidyaAI] Vertex AI project: ${process.env.VERTEX_AI_PROJECT_ID || '(not set)'}`);
+});
+
+server.on('error', (err) => {
+  console.error('[VaidyaAI] Server failed to start:', err.message);
+  process.exit(1);
 });

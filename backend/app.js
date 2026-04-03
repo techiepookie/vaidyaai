@@ -37,8 +37,15 @@ function createApp() {
   app.use(helmet({
     contentSecurityPolicy: {
       directives: {
-        defaultSrc: ["'none'"],
-        frameSrc:   ["'none'"],
+        defaultSrc:  ["'self'"],
+        scriptSrc:   ["'self'", "'unsafe-inline'", "https://unpkg.com", "https://www.gstatic.com"],
+        styleSrc:    ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://unpkg.com"],
+        fontSrc:     ["'self'", "https://fonts.gstatic.com"],
+        imgSrc:      ["'self'", "data:", "https://*.tile.openstreetmap.org", "https://unpkg.com"],
+        connectSrc:  ["'self'", "https://*.googleapis.com", "https://identitytoolkit.googleapis.com", "https://securetoken.googleapis.com"],
+        frameSrc:    ["'none'"],
+        objectSrc:   ["'none'"],
+        baseUri:     ["'self'"],
       },
     },
     hsts: { maxAge: 31536000, includeSubDomains: true, preload: true },

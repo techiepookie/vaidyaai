@@ -8,11 +8,11 @@ FROM node:20-alpine AS deps
 
 WORKDIR /app
 
-# Copy only the manifests first to leverage Docker layer cache
-COPY package.json package-lock.json* ./
+# Copy only package.json first to leverage Docker layer caching
+COPY package.json ./
 
-# Install production deps only (no devDependencies, no optional)
-RUN npm install --omit=dev --omit=optional --prefer-offline
+# Install production dependencies only
+RUN npm install --omit=dev --omit=optional
 
 # ── Stage 2: final runtime image ───────────────────────────────────
 FROM node:20-alpine AS runner

@@ -24,6 +24,7 @@ const rateLimit    = require('express-rate-limit');
 const symptomCheckRouter    = require('./routes/symptomCheck');
 const bookAppointmentRouter = require('./routes/bookAppointment');
 const slotsRouter           = require('./routes/slots');
+const configRouter          = require('./routes/config');
 
 /**
  * Creates and configures the Express application.
@@ -92,6 +93,7 @@ function createApp() {
   app.use('/symptom-check',    aiRateLimit, symptomCheckRouter);
   app.use('/book-appointment', bookAppointmentRouter);
   app.use('/slots',            slotsRouter);
+  app.use('/config',           configRouter);
 
   // ── 404 handler ──────────────────────────────────────────────
   app.use((_req, res) => {

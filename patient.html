@@ -31,18 +31,18 @@
 
       <!-- Tab navigation -->
       <nav class="tab-nav" aria-label="Patient dashboard sections">
-        <div class="tab-nav__list" role="tablist">
+        <div class="tab-nav__list" role="tablist" id="tab-nav-list">
           <button class="tab-nav__btn" role="tab" aria-selected="true"  data-tab="tab-appointments" id="nav-appointments">
-            <span class="tab-nav__icon" aria-hidden="true">📅</span> Appointments
+            Appointments
           </button>
           <button class="tab-nav__btn" role="tab" aria-selected="false" data-tab="tab-symptom"      id="nav-symptom" tabindex="-1">
-            <span class="tab-nav__icon" aria-hidden="true">⭐</span> Symptom Checker
+            Symptom Checker
           </button>
           <button class="tab-nav__btn" role="tab" aria-selected="false" data-tab="tab-maps"         id="nav-maps" tabindex="-1">
-            <span class="tab-nav__icon" aria-hidden="true">🗺️</span> Clinic Finder
+            Clinic Finder
           </button>
           <button class="tab-nav__btn" role="tab" aria-selected="false" data-tab="tab-profile"      id="nav-profile" tabindex="-1">
-            <span class="tab-nav__icon" aria-hidden="true">👤</span> Profile
+            Profile
           </button>
         </div>
       </nav>
@@ -303,7 +303,8 @@
     document.getElementById('avatar-initials').textContent = (currentUser.name || 'P')[0].toUpperCase();
 
     // ── Tab switching ─────────────────────────────────────────
-    initTabs('main', '.tab-panel');
+    // initTabs needs the element that CONTAINS the [data-tab] buttons
+    initTabs('tab-nav-list', '.tab-panel');
 
     // ── Lazy-load Maps when tab activates ────────────────────
     let mapsLoaded = false;

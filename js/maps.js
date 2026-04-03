@@ -78,11 +78,11 @@ function renderMapPlaceholder() {
   if (!container) return;
   container.innerHTML = `
     <div class="clinic-map-placeholder">
-      <div class="clinic-map-placeholder__icon">🗺️</div>
+      <div class="clinic-map-placeholder__icon" aria-hidden="true" style="font-size:2.5rem;opacity:0.3">[ MAP ]</div>
       <div class="text-mono fw-600">Map not configured</div>
       <p>Add your MAPS_API_KEY in js/config.js to enable the interactive map.</p>
       <p style="margin-top:0.5rem;font-size:var(--text-xs)">
-        GCP Console → APIs &amp; Services → Credentials → Create API Key
+        GCP Console &rarr; APIs &amp; Services &rarr; Credentials &rarr; Create API Key
       </p>
     </div>`;
 }

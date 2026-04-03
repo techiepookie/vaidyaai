@@ -50,7 +50,7 @@ async function renderAppointmentList() {
   if (!appointments.length) {
     container.innerHTML = `
       <div class="empty-state">
-        <div class="empty-state__icon">📅</div>
+        <div class="empty-state__icon" aria-hidden="true" style="font-size:2rem;opacity:0.35;font-family:var(--font-mono)">[ ]</div>
         <div class="empty-state__title">No appointments yet</div>
         <p class="empty-state__text">Book your first appointment using the form below.</p>
       </div>`;
@@ -134,7 +134,8 @@ async function loadSlots(doctorId) {
 
   let slots = [];
   try {
-    if (DEMO_MODE || !CLOUD_RUN_BASE_URL) {
+    const useMock = !CLOUD_RUN_BASE_URL || sessionStorage.getItem('vaidyaai_demo_user');
+    if (useMock) {
       slots = generateDemoSlots();
     } else {
       const token = await getIdToken();
@@ -198,7 +199,8 @@ async function confirmBooking(btn) {
                  { name: 'Selected Doctor', specialty: 'General' };
 
   try {
-    if (DEMO_MODE || !CLOUD_RUN_BASE_URL) {
+    const useMock = !CLOUD_RUN_BASE_URL || sessionStorage.getItem('vaidyaai_demo_user');
+    if (useMock) {
       await new Promise(r => setTimeout(r, 800));
       saveMockAppointment({
         patientId: _userId, doctorId: _selectedDoctorId,

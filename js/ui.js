@@ -47,11 +47,12 @@ export function showToast(message, type = 'info', duration = 4000) {
  * @param {string} panelSelector - CSS selector for all tab panels
  */
 export function initTabs(navId, panelSelector) {
-  const nav    = document.getElementById(navId);
+  const nav    = document.getElementById(navId) || document;
   const panels = [...document.querySelectorAll(panelSelector)];
-  if (!nav || !panels.length) return;
+  if (!panels.length) return;
 
-  const buttons = [...nav.querySelectorAll('[data-tab]')];
+  const buttons = [...(nav === document ? document : nav).querySelectorAll('[data-tab]')];
+  if (!buttons.length) return;
 
   function activateTab(tabId) {
     buttons.forEach(btn => {

@@ -44,7 +44,10 @@ export const CLOUD_RUN_BASE_URL = "";
 
 /**
  * Google Maps JavaScript API key.
- * MUST be HTTP-referrer restricted in GCP Console before production.
+ * SECURITY: This is intentionally empty. The Maps API key is fetched
+ * from the backend /config endpoint after authentication, so it is
+ * never exposed in static frontend source files.
+ * Set MAPS_API_KEY env var on Cloud Run before deploying.
  * @type {string}
  */
 export const MAPS_API_KEY = "";

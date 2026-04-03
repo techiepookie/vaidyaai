@@ -3,900 +3,885 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="VaidyaAI — AI-powered healthcare platform. Instant symptom triage via Gemini 2.5 Pro, smart appointment booking, and real-time doctor queues." />
+  <meta name="description" content="VaidyaAI — AI-powered healthcare platform. Instant symptom triage via Gemini AI, smart appointment booking, and real-time doctor queues for India." />
   <meta property="og:title" content="VaidyaAI — Intelligent Healthcare" />
-  <meta property="og:description" content="Every patient heard. Every doctor prepared. Powered by Gemini AI." />
+  <meta property="og:description" content="Every patient heard. Every doctor prepared." />
   <title>VaidyaAI — Intelligent Healthcare Platform</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,700;0,800;1,700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet" />
   <style>
-    /* ─── Reset & Base ─────────────────────────────────────── */
+    /* ─── Design Tokens (mirrors main.css) ────────────────────── */
+    :root {
+      --c-black:       #0A0A0A;
+      --c-off-white:   #F5F2EC;
+      --c-grey-900:    #1A1A18;
+      --c-grey-700:    #3D3C38;
+      --c-grey-500:    #6B6860;
+      --c-grey-300:    #B5B2AA;
+      --c-grey-100:    #E3E0D9;
+      --c-white:       #FFFFFF;
+      --c-accent:      #C8302A;
+      --c-accent-dark: #9E1F1A;
+      --font-mono: 'IBM Plex Mono', 'Courier New', monospace;
+      --font-sans: 'IBM Plex Sans', 'Arial', sans-serif;
+      --border:         2px solid var(--c-black);
+      --border-heavy:   4px solid var(--c-black);
+      --border-accent:  4px solid var(--c-accent);
+      --ease: 0.15s ease;
+    }
+
+    /* ─── Reset ────────────────────────────────────────────────── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { font-size: 16px; scroll-behavior: smooth; }
     body {
-      font-family: 'Inter', system-ui, sans-serif;
-      background: #080C14;
-      color: #E8EDF5;
+      font-family: var(--font-sans);
+      font-size: 0.9375rem;
+      line-height: 1.6;
+      color: var(--c-black);
+      background: var(--c-off-white);
       -webkit-font-smoothing: antialiased;
-      overflow-x: hidden;
     }
     a { color: inherit; text-decoration: none; }
     img, svg { display: block; max-width: 100%; }
-
-    /* ─── Design Tokens ─────────────────────────────────────── */
-    :root {
-      --red: #E8362D;
-      --red-dim: #B82820;
-      --red-glow: rgba(232,54,45,0.18);
-      --gold: #C9A84C;
-      --surface-1: #0D1220;
-      --surface-2: #131929;
-      --surface-card: rgba(255,255,255,0.04);
-      --border: rgba(255,255,255,0.08);
-      --border-strong: rgba(255,255,255,0.14);
-      --text-muted: #6B7A99;
-      --text-secondary: #A3ADBF;
-      --ease: cubic-bezier(.22,1,.36,1);
+    ul { list-style: none; }
+    h1,h2,h3,h4 {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
     }
 
-    /* ─── Noise Texture ─────────────────────────────────────── */
-    body::before {
-      content: '';
-      position: fixed; inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
-      opacity: 0.4; pointer-events: none; z-index: 0;
+    /* ─── Skip link ─────────────────────────────────────────────── */
+    .skip-link {
+      position: absolute; top: -100%; left: 1rem;
+      padding: 0.5rem 1.5rem; background: var(--c-accent);
+      color: var(--c-white); font-family: var(--font-mono);
+      font-size: 0.8125rem; font-weight: 600; z-index: 9999;
+      transition: top 0.15s;
     }
+    .skip-link:focus { top: 1rem; }
 
-    /* ─── Nav ───────────────────────────────────────────────── */
+    /* ─── Nav ───────────────────────────────────────────────────── */
     .nav {
-      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      position: sticky; top: 0; z-index: 100;
+      background: var(--c-black);
+      border-bottom: var(--border-accent);
+    }
+    .nav__inner {
       display: flex; align-items: center; justify-content: space-between;
-      padding: 1.25rem 4rem;
-      background: rgba(8,12,20,0.8);
-      backdrop-filter: blur(20px);
-      border-bottom: 1px solid var(--border);
+      max-width: 1280px; margin: 0 auto;
+      padding: 0 2rem;
     }
     .nav__logo {
-      font-family: 'Inter', sans-serif;
-      font-weight: 800; font-size: 1.25rem;
-      letter-spacing: -0.04em;
-      color: #fff;
+      font-family: var(--font-mono);
+      font-size: 1.125rem; font-weight: 700;
+      letter-spacing: -0.04em; color: var(--c-off-white);
+      padding: 1.125rem 0;
     }
-    .nav__logo span { color: var(--red); }
-    .nav__links { display: flex; align-items: center; gap: 2.5rem; }
+    .nav__logo span { color: var(--c-accent); }
+    .nav__links {
+      display: flex; align-items: stretch; gap: 0;
+    }
     .nav__link {
-      font-size: 0.875rem; font-weight: 500; color: var(--text-secondary);
-      letter-spacing: 0.01em;
-      transition: color 0.2s;
+      display: flex; align-items: center;
+      padding: 0 1.25rem;
+      font-family: var(--font-mono); font-size: 0.75rem;
+      font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+      color: var(--c-grey-300);
+      border-left: 1px solid var(--c-grey-900);
+      transition: color var(--ease), background var(--ease);
+      min-height: 56px;
     }
-    .nav__link:hover { color: #fff; }
+    .nav__link:hover { color: var(--c-off-white); background: var(--c-grey-900); }
     .nav__cta {
-      display: inline-flex; align-items: center; gap: 0.5rem;
-      padding: 0.625rem 1.5rem;
-      background: var(--red);
-      color: #fff;
-      font-size: 0.875rem; font-weight: 600;
-      letter-spacing: 0.02em;
-      border-radius: 6px;
-      transition: background 0.2s, transform 0.15s;
+      display: flex; align-items: center;
+      padding: 0 1.5rem;
+      background: var(--c-accent); color: var(--c-white);
+      font-family: var(--font-mono); font-size: 0.75rem;
+      font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+      border-left: var(--border-accent);
+      min-height: 56px;
+      transition: background var(--ease);
     }
-    .nav__cta:hover { background: #C82920; transform: translateY(-1px); }
+    .nav__cta:hover { background: var(--c-accent-dark); }
 
-    /* ─── Hero ──────────────────────────────────────────────── */
+    /* ─── Hero ──────────────────────────────────────────────────── */
     .hero {
-      position: relative; z-index: 1;
-      min-height: 100vh;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      text-align: center;
-      padding: 8rem 2rem 6rem;
-      overflow: hidden;
+      border-bottom: var(--border-heavy);
+      background: var(--c-black);
     }
-
-    /* Ambient glow blobs */
-    .hero__blob {
-      position: absolute; border-radius: 50%;
-      filter: blur(120px); pointer-events: none; user-select: none;
-    }
-    .hero__blob--1 {
-      width: 600px; height: 600px;
-      background: radial-gradient(circle, rgba(232,54,45,0.14), transparent 70%);
-      top: -100px; left: -150px;
-    }
-    .hero__blob--2 {
-      width: 500px; height: 500px;
-      background: radial-gradient(circle, rgba(201,168,76,0.08), transparent 70%);
-      bottom: 0; right: -100px;
-    }
-    .hero__blob--3 {
-      width: 400px; height: 400px;
-      background: radial-gradient(circle, rgba(60,100,200,0.06), transparent 70%);
-      top: 30%; left: 50%; transform: translateX(-50%);
-    }
-
-    /* Grid lines */
     .hero__grid {
-      position: absolute; inset: 0; z-index: 0;
-      background-image:
-        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
-      background-size: 60px 60px;
-      mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, black, transparent);
+      display: grid;
+      grid-template-columns: 1fr 420px;
+      max-width: 1280px; margin: 0 auto;
+      min-height: calc(100vh - 56px);
     }
-
-    .hero__inner { position: relative; z-index: 1; max-width: 900px; }
-
+    .hero__main {
+      padding: 5rem 4rem 5rem 2rem;
+      border-right: var(--border-heavy);
+      display: flex; flex-direction: column; justify-content: center;
+      position: relative;
+    }
     .hero__eyebrow {
-      display: inline-flex; align-items: center; gap: 0.625rem;
-      padding: 0.375rem 1rem;
-      background: rgba(232,54,45,0.1);
-      border: 1px solid rgba(232,54,45,0.25);
-      border-radius: 100px;
-      font-size: 0.75rem; font-weight: 600;
-      letter-spacing: 0.1em; text-transform: uppercase;
-      color: var(--red);
+      font-family: var(--font-mono);
+      font-size: 0.6875rem; font-weight: 600;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--c-accent);
       margin-bottom: 2rem;
+      display: flex; align-items: center; gap: 0.75rem;
     }
     .hero__eyebrow::before {
       content: '';
-      width: 6px; height: 6px;
-      background: var(--red);
-      border-radius: 50%;
-      animation: pulse 2s ease-in-out infinite;
+      display: inline-block; width: 32px; height: 2px;
+      background: var(--c-accent);
     }
-
     .hero__headline {
-      font-family: 'Playfair Display', Georgia, serif;
-      font-size: clamp(2.75rem, 7vw, 5.5rem);
-      font-weight: 800;
-      line-height: 1.05;
-      letter-spacing: -0.02em;
-      color: #fff;
-      margin-bottom: 1.75rem;
-    }
-    .hero__headline em {
-      font-style: italic;
-      color: var(--red);
-    }
-
-    .hero__sub {
-      font-size: clamp(1rem, 2vw, 1.25rem);
-      font-weight: 400;
-      color: var(--text-secondary);
-      line-height: 1.7;
-      max-width: 620px;
-      margin: 0 auto 3rem;
-    }
-
-    .hero__actions {
-      display: flex; align-items: center; justify-content: center;
-      gap: 1rem; flex-wrap: wrap;
-    }
-    .btn-primary {
-      display: inline-flex; align-items: center; gap: 0.5rem;
-      padding: 0.875rem 2rem;
-      background: var(--red);
-      color: #fff;
-      font-size: 0.9375rem; font-weight: 600;
-      letter-spacing: 0.01em;
-      border-radius: 8px;
-      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
-      box-shadow: 0 4px 24px rgba(232,54,45,0.3);
-    }
-    .btn-primary:hover { background: #C82920; transform: translateY(-2px); box-shadow: 0 8px 32px rgba(232,54,45,0.4); }
-    .btn-ghost {
-      display: inline-flex; align-items: center; gap: 0.5rem;
-      padding: 0.875rem 2rem;
-      background: transparent;
-      color: var(--text-secondary);
-      font-size: 0.9375rem; font-weight: 500;
-      border: 1px solid var(--border-strong);
-      border-radius: 8px;
-      transition: color 0.2s, border-color 0.2s, background 0.2s;
-    }
-    .btn-ghost:hover { color: #fff; border-color: rgba(255,255,255,0.3); background: rgba(255,255,255,0.04); }
-
-    /* Hero scroll indicator */
-    .hero__scroll {
-      position: absolute; bottom: 2.5rem; left: 50%; transform: translateX(-50%);
-      display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
-      font-size: 0.6875rem; letter-spacing: 0.12em; text-transform: uppercase;
-      color: var(--text-muted);
-    }
-    .hero__scroll::after {
-      content: '';
-      width: 1px; height: 48px;
-      background: linear-gradient(to bottom, var(--text-muted), transparent);
-      animation: scrollLine 2s ease-in-out infinite;
-    }
-
-    /* ─── Metrics Strip ─────────────────────────────────────── */
-    .metrics {
-      position: relative; z-index: 1;
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-      background: var(--surface-1);
-      padding: 3.5rem 4rem;
-    }
-    .metrics__inner {
-      max-width: 1200px; margin: 0 auto;
-      display: grid; grid-template-columns: repeat(4, 1fr);
-      gap: 2rem;
-    }
-    .metric {
-      text-align: center;
-      padding: 1.5rem;
-      border-right: 1px solid var(--border);
-    }
-    .metric:last-child { border-right: none; }
-    .metric__value {
-      font-family: 'Inter', sans-serif;
-      font-size: clamp(2rem, 4vw, 3rem);
-      font-weight: 800;
-      letter-spacing: -0.04em;
-      color: #fff;
-      line-height: 1;
-      margin-bottom: 0.5rem;
-    }
-    .metric__value span { color: var(--red); }
-    .metric__label {
-      font-size: 0.8125rem;
-      font-weight: 500;
-      color: var(--text-muted);
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-    }
-
-    /* ─── Section Shared ─────────────────────────────────────── */
-    .section {
-      position: relative; z-index: 1;
-      padding: 7rem 4rem;
-    }
-    .section__inner { max-width: 1200px; margin: 0 auto; }
-    .section__tag {
-      display: inline-block;
-      font-size: 0.75rem; font-weight: 700;
-      letter-spacing: 0.12em; text-transform: uppercase;
-      color: var(--red);
-      margin-bottom: 1rem;
-    }
-    .section__title {
-      font-family: 'Playfair Display', Georgia, serif;
-      font-size: clamp(2rem, 4vw, 3.25rem);
+      font-family: var(--font-mono);
+      font-size: clamp(2.5rem, 5.5vw, 4.5rem);
       font-weight: 700;
-      line-height: 1.15;
-      letter-spacing: -0.02em;
-      color: #fff;
-      margin-bottom: 1.25rem;
-    }
-    .section__title em { font-style: italic; color: var(--red); }
-    .section__subtitle {
-      font-size: 1.0625rem;
-      color: var(--text-secondary);
-      line-height: 1.7;
-      max-width: 560px;
-    }
-
-    /* ─── Features Grid ─────────────────────────────────────── */
-    .features { background: var(--surface-1); }
-    .features__header { margin-bottom: 4rem; }
-    .features__grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1.5px;
-      background: var(--border);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      overflow: hidden;
-    }
-
-    .feature-card {
-      background: var(--surface-2);
-      padding: 2.5rem;
-      transition: background 0.25s;
-      position: relative;
-      overflow: hidden;
-    }
-    .feature-card::after {
-      content: '';
-      position: absolute; bottom: 0; left: 0; right: 0;
-      height: 2px;
-      background: linear-gradient(90deg, transparent, var(--red), transparent);
-      opacity: 0;
-      transition: opacity 0.3s;
-    }
-    .feature-card:hover { background: rgba(232,54,45,0.04); }
-    .feature-card:hover::after { opacity: 1; }
-
-    .feature-card__icon {
-      width: 48px; height: 48px;
-      border: 1px solid var(--border-strong);
-      border-radius: 10px;
-      display: flex; align-items: center; justify-content: center;
-      margin-bottom: 1.5rem;
-      background: rgba(255,255,255,0.03);
-    }
-    .feature-card__icon svg { width: 22px; height: 22px; stroke: var(--red); }
-    .feature-card__title {
-      font-size: 1.0625rem; font-weight: 700;
-      color: #fff; margin-bottom: 0.75rem;
-      letter-spacing: -0.02em;
-    }
-    .feature-card__text {
-      font-size: 0.875rem; line-height: 1.7;
-      color: var(--text-secondary);
-    }
-    .feature-card__tag {
-      display: inline-block; margin-top: 1.25rem;
-      padding: 0.25rem 0.625rem;
-      background: rgba(232,54,45,0.1);
-      border: 1px solid rgba(232,54,45,0.2);
-      border-radius: 4px;
-      font-size: 0.6875rem; font-weight: 600;
-      letter-spacing: 0.08em; text-transform: uppercase;
-      color: var(--red);
-    }
-
-    /* ─── How It Works ──────────────────────────────────────── */
-    .how-it-works { background: #080C14; }
-    .steps {
-      display: grid; grid-template-columns: repeat(4, 1fr);
-      gap: 0;
-      margin-top: 4rem;
-      position: relative;
-    }
-    .steps::before {
-      content: '';
-      position: absolute; top: 28px; left: 10%; right: 10%;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, var(--border-strong), var(--border-strong), transparent);
-    }
-    .step {
-      padding: 0 2rem;
-      text-align: center;
-      position: relative;
-    }
-    .step__number {
-      width: 56px; height: 56px;
-      background: var(--surface-2);
-      border: 1px solid var(--border-strong);
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 0.875rem; font-weight: 700;
-      color: var(--red);
-      margin: 0 auto 1.5rem;
-      position: relative; z-index: 1;
-    }
-    .step__title {
-      font-size: 1rem; font-weight: 700;
-      color: #fff; margin-bottom: 0.625rem;
-      letter-spacing: -0.01em;
-    }
-    .step__text {
-      font-size: 0.8125rem; line-height: 1.7;
-      color: var(--text-secondary);
-    }
-
-    /* ─── Testimonial / Quote ────────────────────────────────── */
-    .quote-section {
-      background: var(--surface-1);
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-    }
-    .quote-section__inner {
-      max-width: 800px; margin: 0 auto;
-      text-align: center; padding: 6rem 2rem;
-    }
-    .quote-mark {
-      font-family: 'Playfair Display', serif;
-      font-size: 5rem; line-height: 0.5;
-      color: var(--red); opacity: 0.4;
-      display: block; margin-bottom: 1rem;
-    }
-    .quote__text {
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(1.25rem, 3vw, 1.875rem);
-      font-style: italic;
-      line-height: 1.55;
-      color: #fff;
+      line-height: 1.0;
+      letter-spacing: -0.04em;
+      color: var(--c-off-white);
       margin-bottom: 2rem;
     }
-    .quote__author {
-      font-size: 0.875rem; font-weight: 600;
-      color: var(--text-muted);
-      letter-spacing: 0.06em; text-transform: uppercase;
+    .hero__headline em {
+      font-style: normal;
+      color: var(--c-accent);
+      display: block;
+    }
+    .hero__sub {
+      font-family: var(--font-sans);
+      font-size: 1.0625rem;
+      font-weight: 400;
+      line-height: 1.7;
+      color: var(--c-grey-300);
+      max-width: 540px;
+      margin-bottom: 3rem;
+      border-left: 4px solid var(--c-grey-700);
+      padding-left: 1.25rem;
+    }
+    .hero__actions {
+      display: flex; gap: 0; align-items: stretch;
+    }
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 0.75rem;
+      padding: 1rem 2rem;
+      background: var(--c-accent); color: var(--c-white);
+      font-family: var(--font-mono); font-size: 0.8125rem;
+      font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+      border: var(--border-heavy); border-color: var(--c-accent-dark);
+      transition: background var(--ease), transform 0.1s;
+    }
+    .btn-primary:hover { background: var(--c-accent-dark); }
+    .btn-primary:active { transform: translateY(1px); }
+    .btn-ghost {
+      display: inline-flex; align-items: center; gap: 0.75rem;
+      padding: 1rem 2rem;
+      background: transparent; color: var(--c-off-white);
+      font-family: var(--font-mono); font-size: 0.8125rem;
+      font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+      border: 2px solid var(--c-grey-700);
+      border-left: none;
+      transition: border-color var(--ease), background var(--ease);
+    }
+    .btn-ghost:hover { border-color: var(--c-off-white); background: rgba(245,242,236,0.06); }
+
+    .hero__side {
+      padding: 4rem 2rem;
+      display: flex; flex-direction: column; justify-content: space-between;
+      gap: 0;
+    }
+    .hero__badge {
+      display: block;
+      padding: 1.5rem;
+      border: var(--border-heavy); border-color: var(--c-grey-700);
+      margin-bottom: 1.5rem;
+    }
+    .hero__badge-label {
+      font-family: var(--font-mono); font-size: 0.6875rem;
+      font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--c-grey-500); margin-bottom: 0.5rem;
+    }
+    .hero__badge-value {
+      font-family: var(--font-mono); font-size: 1rem;
+      font-weight: 600; color: var(--c-off-white);
+    }
+    .hero__badge-value .tag {
+      display: inline-block; margin-top: 0.375rem;
+      padding: 2px 0.5rem;
+      border: 1px solid var(--c-accent);
+      color: var(--c-accent);
+      font-size: 0.6875rem; letter-spacing: 0.06em;
+    }
+    .hero__tech {
+      border-top: 1px solid var(--c-grey-900);
+      padding-top: 1.5rem;
+    }
+    .hero__tech-label {
+      font-family: var(--font-mono); font-size: 0.6875rem;
+      font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--c-grey-500); margin-bottom: 0.875rem;
+    }
+    .hero__tech-list {
+      display: flex; flex-direction: column; gap: 0;
+    }
+    .hero__tech-item {
+      font-family: var(--font-mono); font-size: 0.75rem;
+      color: var(--c-grey-300);
+      padding: 0.5rem 0;
+      border-top: 1px solid var(--c-grey-900);
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .hero__tech-item::before {
+      content: '→'; color: var(--c-accent); font-weight: 700;
     }
 
-    /* ─── Tech Stack ─────────────────────────────────────────── */
-    .tech-strip {
-      background: #080C14;
-      padding: 3rem 4rem;
-      border-top: 1px solid var(--border);
+    /* ─── Section utility ────────────────────────────────────────── */
+    .section-wrap {
+      max-width: 1280px; margin: 0 auto; padding: 0 2rem;
     }
-    .tech-strip__inner {
-      max-width: 1200px; margin: 0 auto;
-      display: flex; align-items: center;
-      gap: 1rem; flex-wrap: wrap;
+    .section-head {
+      padding: 4rem 0 3rem;
+      border-bottom: var(--border-heavy);
+      display: flex; align-items: flex-end; justify-content: space-between;
+      gap: 2rem;
     }
-    .tech-strip__label {
-      font-size: 0.75rem; font-weight: 600;
-      letter-spacing: 0.1em; text-transform: uppercase;
-      color: var(--text-muted);
-      margin-right: 1rem;
-      white-space: nowrap;
+    .section-tag {
+      font-family: var(--font-mono); font-size: 0.6875rem;
+      font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--c-accent); margin-bottom: 0.75rem;
     }
-    .tech-pill {
-      display: inline-flex; align-items: center;
-      padding: 0.375rem 0.875rem;
-      background: var(--surface-card);
-      border: 1px solid var(--border);
-      border-radius: 100px;
-      font-size: 0.8125rem; font-weight: 500;
-      color: var(--text-secondary);
-      transition: border-color 0.2s, color 0.2s;
+    .section-title {
+      font-family: var(--font-mono);
+      font-size: clamp(1.75rem, 3vw, 2.5rem);
+      font-weight: 700; letter-spacing: -0.03em;
+      color: var(--c-black);
     }
-    .tech-pill:hover { border-color: var(--border-strong); color: #fff; }
+    .section-sub {
+      font-size: 0.875rem; color: var(--c-grey-500);
+      font-family: var(--font-mono); text-align: right;
+      max-width: 280px;
+    }
 
-    /* ─── Roles Section ──────────────────────────────────────── */
-    .roles { background: var(--surface-1); }
-    .roles__grid {
-      display: grid; grid-template-columns: 1fr 1fr;
-      gap: 1.5rem;
-      margin-top: 3.5rem;
+    /* ─── Features strip (label + value grid) ────────────────────── */
+    .features-section { border-bottom: var(--border-heavy); }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
     }
-    .role-card {
-      padding: 3rem;
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      background: var(--surface-2);
-      position: relative; overflow: hidden;
-      transition: transform 0.25s var(--ease), box-shadow 0.25s;
+    .feature-block {
+      padding: 3rem 2rem;
+      border-right: var(--border);
+      border-top: var(--border);
+      position: relative;
+      transition: background var(--ease);
     }
-    .role-card:hover { transform: translateY(-4px); box-shadow: 0 24px 64px rgba(0,0,0,0.4); }
-    .role-card::before {
-      content: '';
-      position: absolute; top: 0; left: 0; right: 0;
-      height: 3px;
+    .feature-block:nth-child(3n) { border-right: none; }
+    .feature-block:hover { background: var(--c-white); }
+    .feature-block::before {
+      content: attr(data-num);
+      position: absolute; top: 2rem; right: 2rem;
+      font-family: var(--font-mono); font-size: 0.75rem;
+      font-weight: 600; color: var(--c-grey-300);
+      letter-spacing: 0.06em;
     }
-    .role-card--patient::before { background: linear-gradient(90deg, var(--red), #FF6B6B); }
-    .role-card--doctor::before  { background: linear-gradient(90deg, var(--gold), #E8C46A); }
-
-    .role-card__label {
-      font-size: 0.6875rem; font-weight: 700;
-      letter-spacing: 0.12em; text-transform: uppercase;
-      color: var(--text-muted);
-      margin-bottom: 0.875rem;
-    }
-    .role-card__title {
-      font-size: 1.625rem; font-weight: 800;
-      color: #fff; letter-spacing: -0.03em;
-      margin-bottom: 0.875rem;
-    }
-    .role-card__desc {
-      font-size: 0.9375rem; color: var(--text-secondary);
-      line-height: 1.7; margin-bottom: 2rem;
-    }
-    .role-card__list { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 2.5rem; }
-    .role-card__list-item {
-      display: flex; align-items: flex-start; gap: 0.75rem;
-      font-size: 0.875rem; color: var(--text-secondary); line-height: 1.5;
-    }
-    .role-card__list-item::before {
-      content: '';
-      width: 16px; height: 16px; flex-shrink: 0; margin-top: 1px;
-      border-radius: 50%;
-      background: rgba(232,54,45,0.15);
-      border: 1px solid rgba(232,54,45,0.3);
+    .feature-block__icon {
+      width: 44px; height: 44px;
+      border: var(--border);
       display: flex; align-items: center; justify-content: center;
+      margin-bottom: 1.5rem;
+      background: var(--c-black);
     }
-    .role-card--doctor .role-card__list-item::before {
-      background: rgba(201,168,76,0.15);
-      border-color: rgba(201,168,76,0.3);
+    .feature-block__icon svg {
+      width: 20px; height: 20px; stroke: var(--c-off-white);
+    }
+    .feature-block__title {
+      font-family: var(--font-mono); font-size: 1rem;
+      font-weight: 700; letter-spacing: -0.02em;
+      margin-bottom: 0.75rem; color: var(--c-black);
+    }
+    .feature-block__text {
+      font-size: 0.875rem; line-height: 1.75;
+      color: var(--c-grey-500);
+    }
+    .feature-block__tag {
+      display: inline-block; margin-top: 1.25rem;
+      padding: 2px 0.625rem;
+      border: 1px solid var(--c-grey-300);
+      font-family: var(--font-mono); font-size: 0.6875rem;
+      font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+      color: var(--c-grey-500);
     }
 
-    .role-card__btn {
-      display: inline-flex; align-items: center; gap: 0.5rem;
-      padding: 0.75rem 1.5rem;
-      border: 1px solid var(--border-strong);
-      border-radius: 8px;
-      font-size: 0.875rem; font-weight: 600;
-      color: #fff;
-      transition: background 0.2s, border-color 0.2s;
+    /* ─── How it works ───────────────────────────────────────────── */
+    .how-section { border-bottom: var(--border-heavy); }
+    .steps-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr);
     }
-    .role-card--patient .role-card__btn:hover { background: rgba(232,54,45,0.1); border-color: rgba(232,54,45,0.4); }
-    .role-card--doctor  .role-card__btn:hover { background: rgba(201,168,76,0.1); border-color: rgba(201,168,76,0.4); }
+    .step-block {
+      padding: 3rem 2rem;
+      border-right: var(--border);
+      border-top: var(--border);
+    }
+    .step-block:last-child { border-right: none; }
+    .step-block__num {
+      font-family: var(--font-mono);
+      font-size: 3rem; font-weight: 700;
+      color: var(--c-grey-100);
+      line-height: 1; margin-bottom: 1.5rem;
+      letter-spacing: -0.04em;
+    }
+    .step-block__title {
+      font-family: var(--font-mono); font-size: 0.9375rem;
+      font-weight: 700; letter-spacing: -0.02em;
+      margin-bottom: 0.75rem; color: var(--c-black);
+    }
+    .step-block__text {
+      font-size: 0.8125rem; line-height: 1.75; color: var(--c-grey-500);
+    }
+    .step-block__arrow {
+      display: inline-block; margin-top: 1.5rem;
+      font-family: var(--font-mono); font-size: 1.25rem;
+      color: var(--c-accent); font-weight: 700;
+    }
+    .step-block:last-child .step-block__arrow { display: none; }
 
-    /* ─── CTA Section ────────────────────────────────────────── */
-    .cta {
-      background: #080C14;
-      padding: 8rem 4rem;
-      text-align: center;
-      position: relative; overflow: hidden;
+    /* ─── Statement (large quote) ────────────────────────────────── */
+    .statement {
+      background: var(--c-black);
+      border-bottom: var(--border-heavy);
+      padding: 5rem 2rem;
     }
-    .cta__glow {
-      position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
-      width: 800px; height: 400px;
-      background: radial-gradient(ellipse, rgba(232,54,45,0.08), transparent 70%);
-      pointer-events: none;
+    .statement__inner {
+      max-width: 1280px; margin: 0 auto;
+      display: grid; grid-template-columns: 160px 1fr;
+      gap: 4rem; align-items: start;
     }
-    .cta__inner { position: relative; z-index: 1; max-width: 680px; margin: 0 auto; }
-    .cta__title {
-      font-family: 'Playfair Display', serif;
-      font-size: clamp(2rem, 5vw, 3.5rem);
-      font-weight: 800;
-      line-height: 1.1;
-      color: #fff;
+    .statement__label {
+      font-family: var(--font-mono); font-size: 0.6875rem;
+      font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--c-grey-500);
+      padding-top: 0.5rem;
+      border-right: 1px solid var(--c-grey-900);
+      padding-right: 2rem;
+    }
+    .statement__text {
+      font-family: var(--font-mono);
+      font-size: clamp(1.5rem, 3vw, 2.25rem);
+      font-weight: 700; line-height: 1.25;
+      letter-spacing: -0.03em; color: var(--c-off-white);
+    }
+    .statement__text em {
+      font-style: normal; color: var(--c-accent);
+    }
+
+    /* ─── Roles ──────────────────────────────────────────────────── */
+    .roles-section { border-bottom: var(--border-heavy); }
+    .roles-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      border-top: var(--border);
+    }
+    .role-block {
+      padding: 4rem 2rem;
+      border-right: var(--border);
+      position: relative;
+    }
+    .role-block:last-child { border-right: none; }
+    .role-block--doctor { background: var(--c-black); }
+    .role-block__label {
+      font-family: var(--font-mono); font-size: 0.6875rem;
+      font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;
       margin-bottom: 1.25rem;
     }
-    .cta__subtitle {
-      font-size: 1.0625rem; color: var(--text-secondary);
-      line-height: 1.7; margin-bottom: 2.5rem;
+    .role-block--patient .role-block__label { color: var(--c-accent); }
+    .role-block--doctor  .role-block__label { color: var(--c-grey-500); }
+    .role-block__title {
+      font-family: var(--font-mono);
+      font-size: clamp(1.5rem, 2.5vw, 2rem);
+      font-weight: 700; letter-spacing: -0.04em;
+      margin-bottom: 1rem;
     }
-    .cta__actions { display: flex; align-items: center; justify-content: center; gap: 1rem; flex-wrap: wrap; }
-    .cta__note { margin-top: 1.5rem; font-size: 0.8125rem; color: var(--text-muted); }
+    .role-block--patient .role-block__title { color: var(--c-black); }
+    .role-block--doctor  .role-block__title { color: var(--c-off-white); }
+    .role-block__desc {
+      font-size: 0.9375rem; line-height: 1.7;
+      margin-bottom: 2rem;
+    }
+    .role-block--patient .role-block__desc { color: var(--c-grey-700); }
+    .role-block--doctor  .role-block__desc { color: var(--c-grey-300); }
+    .role-block__list {
+      display: flex; flex-direction: column; gap: 0;
+      margin-bottom: 2.5rem;
+    }
+    .role-block__item {
+      font-family: var(--font-mono); font-size: 0.8125rem;
+      padding: 0.625rem 0;
+      border-top: 1px solid;
+      display: flex; align-items: flex-start; gap: 0.75rem;
+    }
+    .role-block--patient .role-block__item { border-color: var(--c-grey-100); color: var(--c-grey-700); }
+    .role-block--doctor  .role-block__item { border-color: var(--c-grey-900); color: var(--c-grey-300); }
+    .role-block__item::before {
+      content: '→'; color: var(--c-accent);
+      font-weight: 700; flex-shrink: 0; margin-top: 1px;
+    }
+    .role-cta {
+      display: inline-flex; align-items: center; gap: 0.625rem;
+      padding: 0.875rem 1.75rem;
+      font-family: var(--font-mono); font-size: 0.75rem;
+      font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+      border: var(--border);
+      transition: background var(--ease), color var(--ease);
+    }
+    .role-block--patient .role-cta {
+      background: var(--c-accent); color: var(--c-white);
+      border-color: var(--c-accent-dark);
+    }
+    .role-block--patient .role-cta:hover { background: var(--c-accent-dark); }
+    .role-block--doctor  .role-cta {
+      background: transparent; color: var(--c-off-white);
+      border-color: var(--c-grey-700);
+    }
+    .role-block--doctor  .role-cta:hover { border-color: var(--c-off-white); background: rgba(245,242,236,0.06); }
 
-    /* ─── Footer ─────────────────────────────────────────────── */
+    /* ─── Tech row ───────────────────────────────────────────────── */
+    .tech-row {
+      border-bottom: var(--border-heavy);
+      background: var(--c-grey-900);
+    }
+    .tech-row__inner {
+      max-width: 1280px; margin: 0 auto;
+      display: grid; grid-template-columns: 200px 1fr;
+    }
+    .tech-row__label {
+      padding: 2rem;
+      font-family: var(--font-mono); font-size: 0.6875rem;
+      font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--c-grey-500);
+      border-right: 1px solid var(--c-grey-700);
+      display: flex; align-items: center;
+    }
+    .tech-row__pills {
+      padding: 2rem;
+      display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center;
+    }
+    .tech-pill {
+      padding: 0.25rem 0.75rem;
+      border: 1px solid var(--c-grey-700);
+      font-family: var(--font-mono); font-size: 0.6875rem;
+      font-weight: 500; color: var(--c-grey-300);
+      letter-spacing: 0.04em;
+      transition: border-color var(--ease), color var(--ease);
+    }
+    .tech-pill:hover { border-color: var(--c-grey-300); color: var(--c-off-white); }
+
+    /* ─── CTA block ──────────────────────────────────────────────── */
+    .cta-block {
+      border-bottom: var(--border-heavy);
+    }
+    .cta-block__inner {
+      max-width: 1280px; margin: 0 auto;
+      display: grid; grid-template-columns: 1fr auto;
+      align-items: center; gap: 4rem;
+      padding: 5rem 2rem;
+    }
+    .cta-block__title {
+      font-family: var(--font-mono);
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 700; letter-spacing: -0.04em;
+      color: var(--c-black); max-width: 560px;
+    }
+    .cta-block__title em { font-style: normal; color: var(--c-accent); }
+    .cta-block__actions { display: flex; flex-direction: column; gap: 0; }
+    .cta-btn-main {
+      display: flex; align-items: center; gap: 0.75rem;
+      padding: 1.25rem 2.5rem;
+      background: var(--c-black); color: var(--c-off-white);
+      font-family: var(--font-mono); font-size: 0.8125rem;
+      font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+      border: var(--border-heavy);
+      transition: background var(--ease);
+    }
+    .cta-btn-main:hover { background: var(--c-grey-900); }
+    .cta-note {
+      margin-top: 1rem;
+      font-family: var(--font-mono); font-size: 0.6875rem;
+      color: var(--c-grey-500); letter-spacing: 0.04em;
+      text-align: right;
+    }
+
+    /* ─── Footer ─────────────────────────────────────────────────── */
     .footer {
-      background: var(--surface-1);
-      border-top: 1px solid var(--border);
-      padding: 3rem 4rem;
+      background: var(--c-black);
     }
     .footer__inner {
-      max-width: 1200px; margin: 0 auto;
-      display: flex; align-items: center; justify-content: space-between;
-      flex-wrap: wrap; gap: 1.5rem;
+      max-width: 1280px; margin: 0 auto;
+      display: grid; grid-template-columns: 1fr auto 1fr;
+      align-items: center; gap: 2rem;
+      padding: 2.5rem 2rem;
+      border-top: 1px solid var(--c-grey-900);
     }
     .footer__logo {
-      font-weight: 800; font-size: 1.125rem;
-      letter-spacing: -0.03em; color: #fff;
+      font-family: var(--font-mono); font-size: 1rem;
+      font-weight: 700; letter-spacing: -0.03em; color: var(--c-off-white);
     }
-    .footer__logo span { color: var(--red); }
-    .footer__copy { font-size: 0.8125rem; color: var(--text-muted); }
-    .footer__links { display: flex; gap: 2rem; }
-    .footer__link { font-size: 0.8125rem; color: var(--text-muted); transition: color 0.2s; }
-    .footer__link:hover { color: #fff; }
+    .footer__logo span { color: var(--c-accent); }
+    .footer__links {
+      display: flex; gap: 0;
+    }
+    .footer__link {
+      padding: 0.5rem 1.25rem;
+      font-family: var(--font-mono); font-size: 0.6875rem;
+      font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+      color: var(--c-grey-500);
+      border-right: 1px solid var(--c-grey-900);
+      transition: color var(--ease);
+    }
+    .footer__link:first-child { border-left: 1px solid var(--c-grey-900); }
+    .footer__link:hover { color: var(--c-off-white); }
+    .footer__copy {
+      font-family: var(--font-mono); font-size: 0.6875rem;
+      color: var(--c-grey-500); text-align: right; letter-spacing: 0.02em;
+    }
 
-    /* ─── Animations ─────────────────────────────────────────── */
-    @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50%       { opacity: 0.6; transform: scale(0.8); }
-    }
-    @keyframes scrollLine {
-      0%   { opacity: 0; transform: scaleY(0); transform-origin: top; }
-      40%  { opacity: 1; transform: scaleY(1); }
-      80%  { opacity: 0; transform: scaleY(1); transform-origin: bottom; }
-      100% { opacity: 0; }
-    }
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(24px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-    .fade-up { animation: fadeUp 0.7s var(--ease) both; }
-    .delay-1 { animation-delay: 0.1s; }
-    .delay-2 { animation-delay: 0.2s; }
-    .delay-3 { animation-delay: 0.3s; }
+    /* ─── Scroll reveal ──────────────────────────────────────────── */
+    .reveal { opacity: 0; transform: translateY(16px); transition: opacity 0.5s ease, transform 0.5s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
 
-    /* ─── Responsive ─────────────────────────────────────────── */
+    /* ─── Responsive ─────────────────────────────────────────────── */
     @media (max-width: 1024px) {
-      .nav { padding: 1.25rem 2rem; }
-      .nav__links { display: none; }
-      .section { padding: 5rem 2rem; }
-      .metrics { padding: 2.5rem 2rem; }
-      .metrics__inner { grid-template-columns: repeat(2,1fr); }
-      .metric:nth-child(2) { border-right: none; }
-      .features__grid { grid-template-columns: repeat(2,1fr); }
-      .steps { grid-template-columns: repeat(2,1fr); gap: 3rem; }
-      .steps::before { display: none; }
-      .tech-strip { padding: 2rem; }
+      .hero__grid { grid-template-columns: 1fr; }
+      .hero__main { padding: 4rem 2rem; border-right: none; }
+      .hero__side { display: none; }
+      .features-grid { grid-template-columns: repeat(2,1fr); }
+      .feature-block:nth-child(3n) { border-right: var(--border); }
+      .feature-block:nth-child(2n) { border-right: none; }
+      .steps-grid { grid-template-columns: repeat(2,1fr); }
+      .step-block:nth-child(2n) { border-right: none; }
+      .roles-grid { grid-template-columns: 1fr; }
+      .role-block { border-right: none !important; border-bottom: var(--border); }
+      .statement__inner { grid-template-columns: 1fr; gap: 1.5rem; }
+      .statement__label { border-right: none; padding-right: 0; }
+      .cta-block__inner { grid-template-columns: 1fr; gap: 2rem; }
+      .cta-note { text-align: left; }
     }
     @media (max-width: 768px) {
-      .hero { padding: 7rem 1.5rem 5rem; }
-      .features__grid { grid-template-columns: 1fr; }
-      .roles__grid { grid-template-columns: 1fr; }
-      .steps { grid-template-columns: 1fr; }
-      .metrics__inner { grid-template-columns: 1fr 1fr; }
-      .metric { border-right: none; border-bottom: 1px solid var(--border); }
-      .metric:nth-last-child(-n+2) { border-bottom: none; }
-      .footer__inner { flex-direction: column; text-align: center; }
+      .nav__links { display: none; }
+      .features-grid { grid-template-columns: 1fr; }
+      .feature-block { border-right: none !important; }
+      .steps-grid { grid-template-columns: 1fr 1fr; }
+      .footer__inner { grid-template-columns: 1fr; text-align: center; }
       .footer__links { justify-content: center; }
-      .tech-strip__inner { justify-content: center; }
-      .cta { padding: 5rem 1.5rem; }
+      .footer__copy { text-align: center; }
+    }
+    @media (max-width: 560px) {
+      .steps-grid { grid-template-columns: 1fr; }
+      .step-block { border-right: none !important; }
     }
   </style>
 </head>
 <body>
+  <a href="#main" class="skip-link">Skip to content</a>
 
   <!-- ── Nav ──────────────────────────────────────────────────── -->
   <nav class="nav" role="navigation" aria-label="Main navigation">
-    <div class="nav__logo"><span>वैद्य</span>AI</div>
-    <div class="nav__links">
-      <a href="#features" class="nav__link">Features</a>
-      <a href="#how-it-works" class="nav__link">How It Works</a>
-      <a href="#roles" class="nav__link">For You</a>
+    <div class="nav__inner">
+      <div class="nav__logo"><span>वैद्य</span>AI</div>
+      <div class="nav__links" role="list">
+        <a href="#features" class="nav__link" role="listitem">Features</a>
+        <a href="#how-it-works" class="nav__link" role="listitem">How It Works</a>
+        <a href="#roles" class="nav__link" role="listitem">For You</a>
+      </div>
+      <a href="/index.html" class="nav__cta" id="nav-cta">Get Started</a>
     </div>
-    <a href="/index.html" class="nav__cta">Get Started</a>
   </nav>
 
   <!-- ── Hero ─────────────────────────────────────────────────── -->
-  <section class="hero" aria-label="Hero section">
-    <div class="hero__blob hero__blob--1"></div>
-    <div class="hero__blob hero__blob--2"></div>
-    <div class="hero__blob hero__blob--3"></div>
-    <div class="hero__grid" aria-hidden="true"></div>
-
-    <div class="hero__inner">
-      <div class="hero__eyebrow fade-up">Powered by Gemini 2.5 Pro</div>
-      <h1 class="hero__headline fade-up delay-1">
-        Healthcare that<br><em>actually listens</em><br>to you
-      </h1>
-      <p class="hero__sub fade-up delay-2">
-        VaidyaAI combines the intelligence of Google's Gemini AI with real-time Firestore infrastructure to deliver instant symptom triage, smart appointment booking, and seamless doctor-patient coordination.
-      </p>
-      <div class="hero__actions fade-up delay-3">
-        <a href="/index.html" class="btn-primary" id="hero-cta-patient">
-          I am a Patient
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-        </a>
-        <a href="/index.html" class="btn-ghost" id="hero-cta-doctor">
-          I am a Doctor
-        </a>
+  <section class="hero" id="main" aria-label="Hero">
+    <div class="hero__grid">
+      <div class="hero__main">
+        <div class="hero__eyebrow">Gemini 2.5 Pro + Firebase + Cloud Run</div>
+        <h1 class="hero__headline">
+          No more waiting.<br>
+          No more guessing.<br>
+          <em>Just healthcare.</em>
+        </h1>
+        <p class="hero__sub">
+          VaidyaAI gives patients instant AI-powered symptom triage and connects them with doctors who are already prepared — before the appointment begins.
+        </p>
+        <div class="hero__actions">
+          <a href="/index.html" class="btn-primary" id="hero-patient">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            Patient Login
+          </a>
+          <a href="/index.html" class="btn-ghost" id="hero-doctor">Doctor Login</a>
+        </div>
       </div>
-    </div>
-
-    <div class="hero__scroll" aria-hidden="true">Scroll</div>
-  </section>
-
-  <!-- ── Metrics Strip ─────────────────────────────────────────── -->
-  <section class="metrics" aria-label="Platform statistics">
-    <div class="metrics__inner">
-      <div class="metric">
-        <div class="metric__value"><span id="count-triage">0</span></div>
-        <div class="metric__label">Symptom Analyses</div>
-      </div>
-      <div class="metric">
-        <div class="metric__value"><span id="count-appt">0</span></div>
-        <div class="metric__label">Appointments Booked</div>
-      </div>
-      <div class="metric">
-        <div class="metric__value"><span>2.5</span> Pro</div>
-        <div class="metric__label">Gemini Model</div>
-      </div>
-      <div class="metric">
-        <div class="metric__value">99<span>%</span></div>
-        <div class="metric__label">Uptime SLA</div>
-      </div>
+      <aside class="hero__side" aria-label="Platform information">
+        <div>
+          <div class="hero__badge">
+            <div class="hero__badge-label">AI Engine</div>
+            <div class="hero__badge-value">
+              Gemini 2.5 Pro
+              <span class="tag">Vertex AI</span>
+            </div>
+          </div>
+          <div class="hero__badge">
+            <div class="hero__badge-label">Database</div>
+            <div class="hero__badge-value">
+              Cloud Firestore
+              <span class="tag">Real-time</span>
+            </div>
+          </div>
+          <div class="hero__badge">
+            <div class="hero__badge-label">Auth</div>
+            <div class="hero__badge-value">
+              Firebase Auth
+              <span class="tag">Role-based</span>
+            </div>
+          </div>
+          <div class="hero__badge">
+            <div class="hero__badge-label">Backend</div>
+            <div class="hero__badge-value">
+              Node.js 20 · Cloud Run
+              <span class="tag">Serverless</span>
+            </div>
+          </div>
+        </div>
+        <div class="hero__tech">
+          <div class="hero__tech-label">Try demo instantly</div>
+          <ul class="hero__tech-list" aria-label="Demo accounts">
+            <li class="hero__tech-item">patient@demo.com / any password</li>
+            <li class="hero__tech-item">doctor@demo.com / any password</li>
+          </ul>
+        </div>
+      </aside>
     </div>
   </section>
 
   <!-- ── Features ──────────────────────────────────────────────── -->
-  <section id="features" class="section features" aria-labelledby="features-title">
-    <div class="section__inner">
-      <div class="features__header">
-        <div class="section__tag">Core Features</div>
-        <h2 class="section__title" id="features-title">
-          Every tool your health<br>journey <em>needs</em>
-        </h2>
-        <p class="section__subtitle">
-          From first symptom to confirmed appointment — VaidyaAI guides you through every step with AI precision.
-        </p>
+  <section id="features" class="features-section" aria-labelledby="features-title">
+    <div class="section-wrap">
+      <div class="section-head">
+        <div>
+          <div class="section-tag">Core Features</div>
+          <h2 class="section-title" id="features-title">What VaidyaAI does</h2>
+        </div>
+        <p class="section-sub">Six capabilities. One platform. Zero compromise.</p>
       </div>
+    </div>
+    <div style="max-width:1280px;margin:0 auto;padding:0 2rem">
+      <div class="features-grid">
 
-      <div class="features__grid">
-
-        <!-- AI Triage -->
-        <div class="feature-card">
-          <div class="feature-card__icon" aria-hidden="true">
+        <div class="feature-block reveal" data-num="01">
+          <div class="feature-block__icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96-.46 2.5 2.5 0 0 1-1.04-4.85V8.37A2.5 2.5 0 0 1 9.5 2z"/>
-              <path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96-.46 2.5 2.5 0 0 0 1.04-4.85V8.37A2.5 2.5 0 0 0 14.5 2z"/>
+              <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>
             </svg>
           </div>
-          <div class="feature-card__title">AI Symptom Triage</div>
-          <p class="feature-card__text">
-            Describe your symptoms in plain English, Hindi, or Hinglish. Gemini 2.5 Pro analyses urgency, identifies possible conditions, and recommends the right care pathway in under 3 seconds.
-          </p>
-          <span class="feature-card__tag">Vertex AI</span>
+          <div class="feature-block__title">AI Symptom Triage</div>
+          <p class="feature-block__text">Describe your symptoms in English, Hindi, or Hinglish. Gemini 2.5 Pro assesses urgency, identifies possible conditions, and recommends the right care pathway — in seconds.</p>
+          <span class="feature-block__tag">Vertex AI</span>
         </div>
 
-        <!-- Appointments -->
-        <div class="feature-card">
-          <div class="feature-card__icon" aria-hidden="true">
+        <div class="feature-block reveal" data-num="02">
+          <div class="feature-block__icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
               <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-              <line x1="16" y1="2" x2="16" y2="6"/>
-              <line x1="8"  y1="2" x2="8"  y2="6"/>
-              <line x1="3"  y1="10" x2="21" y2="10"/>
+              <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/>
+              <line x1="3" y1="10" x2="21" y2="10"/>
             </svg>
           </div>
-          <div class="feature-card__title">Smart Appointment Booking</div>
-          <p class="feature-card__text">
-            View real-time availability across specialist and general physicians. Book, reschedule, or cancel with a single click — triage results automatically prefill doctor recommendations.
-          </p>
-          <span class="feature-card__tag">Firestore</span>
+          <div class="feature-block__title">Smart Appointment Booking</div>
+          <p class="feature-block__text">Browse real-time availability across specialist and general physicians. Book in one click. Triage results automatically surface the most relevant doctors for your condition.</p>
+          <span class="feature-block__tag">Firestore</span>
         </div>
 
-        <!-- Doctor Queue -->
-        <div class="feature-card">
-          <div class="feature-card__icon" aria-hidden="true">
+        <div class="feature-block reveal" data-num="03">
+          <div class="feature-block__icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
               <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
               <circle cx="9" cy="7" r="4"/>
-              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-              <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
             </svg>
           </div>
-          <div class="feature-card__title">Real-Time Doctor Queue</div>
-          <p class="feature-card__text">
-            Doctors see their patient queue update live via Firestore's onSnapshot listener. AI urgency scores surface the highest-priority cases at a glance — no manual sorting required.
-          </p>
-          <span class="feature-card__tag">Real-time</span>
+          <div class="feature-block__title">Real-Time Doctor Queue</div>
+          <p class="feature-block__text">Doctors see their patient queue update live using Firestore's onSnapshot listener. AI urgency scores surface the highest-priority cases immediately — no manual sorting required.</p>
+          <span class="feature-block__tag">Real-time</span>
         </div>
 
-        <!-- Clinic Finder -->
-        <div class="feature-card">
-          <div class="feature-card__icon" aria-hidden="true">
+        <div class="feature-block reveal" data-num="04">
+          <div class="feature-block__icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
               <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
               <circle cx="12" cy="10" r="3"/>
             </svg>
           </div>
-          <div class="feature-card__title">Clinic Finder</div>
-          <p class="feature-card__text">
-            Discover nearby hospitals, clinics, and specialty centres on an interactive Google Map. Filter by type, view hours, and get directions — all without leaving the dashboard.
-          </p>
-          <span class="feature-card__tag">Maps API</span>
+          <div class="feature-block__title">Clinic Finder</div>
+          <p class="feature-block__text">Discover nearby hospitals, clinics, and specialty centres on an interactive Google Map. Filter by type, view hours, and get directions without leaving your dashboard.</p>
+          <span class="feature-block__tag">Maps API</span>
         </div>
 
-        <!-- Auth & Roles -->
-        <div class="feature-card">
-          <div class="feature-card__icon" aria-hidden="true">
+        <div class="feature-block reveal" data-num="05">
+          <div class="feature-block__icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
               <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
               <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
             </svg>
           </div>
-          <div class="feature-card__title">Secure Role-Based Access</div>
-          <p class="feature-card__text">
-            Firebase Authentication with strict Firestore security rules ensures patients and doctors only access their own data. ID tokens are validated on every API request — zero trust by default.
-          </p>
-          <span class="feature-card__tag">Firebase Auth</span>
+          <div class="feature-block__title">Secure Role-Based Access</div>
+          <p class="feature-block__text">Firebase Authentication with strict Firestore security rules ensures patients and doctors only access their own records. ID tokens are validated on every single API request.</p>
+          <span class="feature-block__tag">Firebase Auth</span>
         </div>
 
-        <!-- Cloud Run -->
-        <div class="feature-card">
-          <div class="feature-card__icon" aria-hidden="true">
+        <div class="feature-block reveal" data-num="06">
+          <div class="feature-block__icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
               <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
             </svg>
           </div>
-          <div class="feature-card__title">Serverless Backend</div>
-          <p class="feature-card__text">
-            A Node.js 20 Express API runs on Cloud Run — auto-scaling from zero, rate-limited, and protected by Helmet security middleware. Triage results never touch the frontend AI keys.
-          </p>
-          <span class="feature-card__tag">Cloud Run</span>
+          <div class="feature-block__title">Serverless Backend</div>
+          <p class="feature-block__text">A Node.js 20 Express API runs on Google Cloud Run — auto-scaling from zero, rate-limited at 10 AI req/min, protected by Helmet security middleware. AI keys never touch the client.</p>
+          <span class="feature-block__tag">Cloud Run</span>
         </div>
 
       </div>
     </div>
   </section>
 
-  <!-- ── How It Works ───────────────────────────────────────────── -->
-  <section id="how-it-works" class="section how-it-works" aria-labelledby="how-title">
-    <div class="section__inner">
-      <div class="section__tag">How It Works</div>
-      <h2 class="section__title" id="how-title">From symptom to <em>care</em><br>in four steps</h2>
-
-      <div class="steps">
-        <div class="step">
-          <div class="step__number" aria-hidden="true">01</div>
-          <div class="step__title">Describe Your Symptoms</div>
-          <p class="step__text">Type freely in English, Hindi, or Hinglish. No forms, no checkboxes — just describe how you feel.</p>
-        </div>
-        <div class="step">
-          <div class="step__number" aria-hidden="true">02</div>
-          <div class="step__title">Gemini AI Triages</div>
-          <p class="step__text">Gemini 2.5 Pro assesses urgency level, identifies possible conditions, and recommends the next best action.</p>
-        </div>
-        <div class="step">
-          <div class="step__number" aria-hidden="true">03</div>
-          <div class="step__title">Book an Appointment</div>
-          <p class="step__text">The triage result pre-selects the right specialist. Pick an available slot and confirm in one click.</p>
-        </div>
-        <div class="step">
-          <div class="step__number" aria-hidden="true">04</div>
-          <div class="step__title">Doctor Reviews</div>
-          <p class="step__text">Your doctor sees your triage summary, urgency badge, and notes before the appointment — fully prepared.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ── Quote ─────────────────────────────────────────────────── -->
-  <div class="quote-section">
-    <div class="quote-section__inner">
-      <span class="quote-mark" aria-hidden="true">"</span>
-      <blockquote>
-        <p class="quote__text">
-          The future of healthcare is not about replacing doctors with AI — it is about giving every patient the right information, and every doctor the right context, at the right moment.
-        </p>
-        <cite class="quote__author">Vision of VaidyaAI</cite>
-      </blockquote>
+  <!-- ── Statement ─────────────────────────────────────────────── -->
+  <div class="statement" aria-label="Mission statement">
+    <div class="statement__inner">
+      <div class="statement__label">Our Principle</div>
+      <p class="statement__text">
+        The future of healthcare is not about replacing doctors with AI.<br>
+        It is about giving every patient <em>the right information,</em><br>
+        and every doctor <em>the right context,</em> at the right moment.
+      </p>
     </div>
   </div>
 
-  <!-- ── Tech Stack ─────────────────────────────────────────────── -->
-  <div class="tech-strip" aria-label="Technology stack">
-    <div class="tech-strip__inner">
-      <span class="tech-strip__label">Powered by</span>
-      <span class="tech-pill">Firebase Auth</span>
-      <span class="tech-pill">Cloud Firestore</span>
-      <span class="tech-pill">Vertex AI Gemini 2.5 Pro</span>
-      <span class="tech-pill">Cloud Run</span>
-      <span class="tech-pill">Google Maps API</span>
-      <span class="tech-pill">Firebase Hosting</span>
-      <span class="tech-pill">Node.js 20</span>
+  <!-- ── How it Works ──────────────────────────────────────────── -->
+  <section id="how-it-works" class="how-section" aria-labelledby="how-title">
+    <div class="section-wrap">
+      <div class="section-head">
+        <div>
+          <div class="section-tag">Workflow</div>
+          <h2 class="section-title" id="how-title">From symptom to care</h2>
+        </div>
+        <p class="section-sub">Four steps. No paperwork.</p>
+      </div>
+    </div>
+    <div style="max-width:1280px;margin:0 auto;padding:0 2rem">
+      <div class="steps-grid">
+        <div class="step-block reveal">
+          <div class="step-block__num">01</div>
+          <div class="step-block__title">Describe Your Symptoms</div>
+          <p class="step-block__text">Type freely in English, Hindi, or Hinglish. No forms, no checkboxes — just describe exactly how you feel, in your own words.</p>
+          <span class="step-block__arrow" aria-hidden="true">→</span>
+        </div>
+        <div class="step-block reveal">
+          <div class="step-block__num">02</div>
+          <div class="step-block__title">Gemini AI Triages</div>
+          <p class="step-block__text">Gemini 2.5 Pro assesses urgency level, identifies possible conditions, and recommends the clearest next action — instantly.</p>
+          <span class="step-block__arrow" aria-hidden="true">→</span>
+        </div>
+        <div class="step-block reveal">
+          <div class="step-block__num">03</div>
+          <div class="step-block__title">Book an Appointment</div>
+          <p class="step-block__text">The triage result pre-selects the right specialist. Pick an available slot from real-time availability and confirm in one click.</p>
+          <span class="step-block__arrow" aria-hidden="true">→</span>
+        </div>
+        <div class="step-block reveal">
+          <div class="step-block__num">04</div>
+          <div class="step-block__title">Doctor Reviews</div>
+          <p class="step-block__text">Your doctor sees your triage summary, AI urgency score, and symptom description before you arrive — fully prepared, not surprised.</p>
+          <span class="step-block__arrow" aria-hidden="true">→</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Tech Row ───────────────────────────────────────────────── -->
+  <div class="tech-row" aria-label="Technology stack">
+    <div class="tech-row__inner">
+      <div class="tech-row__label">Built With</div>
+      <div class="tech-row__pills">
+        <span class="tech-pill">Firebase Auth</span>
+        <span class="tech-pill">Cloud Firestore</span>
+        <span class="tech-pill">Vertex AI Gemini 2.5 Pro</span>
+        <span class="tech-pill">Cloud Run</span>
+        <span class="tech-pill">Google Maps API</span>
+        <span class="tech-pill">Node.js 20</span>
+        <span class="tech-pill">Firebase Hosting</span>
+        <span class="tech-pill">IBM Plex Mono</span>
+      </div>
     </div>
   </div>
 
   <!-- ── Roles ──────────────────────────────────────────────────── -->
-  <section id="roles" class="section roles" aria-labelledby="roles-title">
-    <div class="section__inner">
-      <div class="section__tag">Built For Everyone</div>
-      <h2 class="section__title" id="roles-title">Choose your <em>journey</em></h2>
-
-      <div class="roles__grid">
-
-        <div class="role-card role-card--patient">
-          <div class="role-card__label">For Patients</div>
-          <div class="role-card__title">Take control of your health</div>
-          <p class="role-card__desc">Get instant AI-powered symptom assessment and connect with the right doctor — without the wait.</p>
-          <ul class="role-card__list" aria-label="Patient features">
-            <li class="role-card__list-item">Instant AI symptom analysis in your language</li>
-            <li class="role-card__list-item">Browse available doctors and real-time slots</li>
-            <li class="role-card__list-item">Full appointment history and triage log</li>
-            <li class="role-card__list-item">Nearby clinic and hospital finder</li>
+  <section id="roles" class="roles-section" aria-labelledby="roles-title">
+    <div class="section-wrap">
+      <div class="section-head">
+        <div>
+          <div class="section-tag">Access</div>
+          <h2 class="section-title" id="roles-title">Choose your dashboard</h2>
+        </div>
+        <p class="section-sub">Two roles. One login. Built for both sides of healthcare.</p>
+      </div>
+    </div>
+    <div style="max-width:1280px;margin:0 auto;padding:0 2rem">
+      <div class="roles-grid">
+        <div class="role-block role-block--patient reveal">
+          <div class="role-block__label">For Patients</div>
+          <h3 class="role-block__title">Take control of your health</h3>
+          <p class="role-block__desc">Get instant AI-powered symptom assessment and connect with the right doctor — without unnecessary waiting or guesswork.</p>
+          <ul class="role-block__list" aria-label="Patient features">
+            <li class="role-block__item">Instant AI symptom analysis in your language</li>
+            <li class="role-block__item">Browse available doctors and current time slots</li>
+            <li class="role-block__item">Full appointment history and triage record</li>
+            <li class="role-block__item">Nearby clinic and hospital finder with maps</li>
           </ul>
-          <a href="/index.html" class="role-card__btn" id="role-patient-cta">
+          <a href="/index.html" class="role-cta" id="role-patient-cta">
             Sign up as Patient
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
           </a>
         </div>
-
-        <div class="role-card role-card--doctor">
-          <div class="role-card__label">For Doctors</div>
-          <div class="role-card__title">A smarter patient queue</div>
-          <p class="role-card__desc">See every patient's AI triage assessment before they arrive — prioritise by urgency, not by order of arrival.</p>
-          <ul class="role-card__list" aria-label="Doctor features">
-            <li class="role-card__list-item">Live patient queue with Firestore real-time sync</li>
-            <li class="role-card__list-item">AI urgency badges — high, moderate, low priority</li>
-            <li class="role-card__list-item">Patient symptom summaries in the queue view</li>
-            <li class="role-card__list-item">Consultation notes with one-click completion</li>
+        <div class="role-block role-block--doctor reveal">
+          <div class="role-block__label">For Doctors</div>
+          <h3 class="role-block__title">A smarter patient queue</h3>
+          <p class="role-block__desc">See every patient's AI triage assessment before they arrive. Prioritise by clinical urgency, not by order of arrival.</p>
+          <ul class="role-block__list" aria-label="Doctor features">
+            <li class="role-block__item">Live patient queue — Firestore real-time sync</li>
+            <li class="role-block__item">AI urgency badges: High, Moderate, Low priority</li>
+            <li class="role-block__item">Patient symptom summary visible in queue view</li>
+            <li class="role-block__item">Consultation notes with one-click completion</li>
           </ul>
-          <a href="/index.html" class="role-card__btn" id="role-doctor-cta">
+          <a href="/index.html" class="role-cta" id="role-doctor-cta">
             Sign up as Doctor
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
           </a>
         </div>
-
       </div>
     </div>
   </section>
 
   <!-- ── CTA ───────────────────────────────────────────────────── -->
-  <section class="cta" aria-label="Call to action">
-    <div class="cta__glow" aria-hidden="true"></div>
-    <div class="cta__inner">
-      <h2 class="cta__title">Start your healthier<br>journey today</h2>
-      <p class="cta__subtitle">Join VaidyaAI for free. No credit card required. Instant access to AI symptom triage and appointment booking.</p>
-      <div class="cta__actions">
-        <a href="/index.html" class="btn-primary" id="cta-signup">
+  <section class="cta-block" aria-label="Call to action">
+    <div class="cta-block__inner">
+      <h2 class="cta-block__title">
+        Start your healthier<br>journey <em>today.</em>
+      </h2>
+      <div class="cta-block__actions">
+        <a href="/index.html" class="cta-btn-main" id="cta-signup">
           Create Free Account
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </a>
-        <a href="/index.html" class="btn-ghost" id="cta-login">Already have an account?</a>
+        <p class="cta-note">
+          No card required. Try demo: patient@demo.com
+        </p>
       </div>
-      <p class="cta__note">Try demo mode instantly — patient@demo.com or doctor@demo.com with any 6+ character password</p>
     </div>
   </section>
 
@@ -904,61 +889,28 @@
   <footer class="footer" role="contentinfo">
     <div class="footer__inner">
       <div class="footer__logo"><span>वैद्य</span>AI</div>
-      <p class="footer__copy">
-        &copy; 2025 VaidyaAI &mdash; AI output is not a substitute for medical advice.
-      </p>
-      <div class="footer__links">
+      <nav class="footer__links" aria-label="Footer navigation">
         <a href="/index.html" class="footer__link">Login</a>
         <a href="#features" class="footer__link">Features</a>
         <a href="#roles" class="footer__link">Get Started</a>
-      </div>
+      </nav>
+      <p class="footer__copy">
+        &copy; 2025 VaidyaAI. AI output is not a substitute for medical advice.
+      </p>
     </div>
   </footer>
 
-  <!-- ── Animated Counters ──────────────────────────────────────── -->
+  <!-- ── Scroll Reveal ──────────────────────────────────────────── -->
   <script>
-    function animateCounter(el, target, suffix = '', duration = 2000) {
-      const start = performance.now();
-      const update = (now) => {
-        const elapsed = now - start;
-        const progress = Math.min(elapsed / duration, 1);
-        const eased = 1 - Math.pow(1 - progress, 3);
-        el.textContent = Math.floor(eased * target).toLocaleString() + suffix;
-        if (progress < 1) requestAnimationFrame(update);
-      };
-      requestAnimationFrame(update);
-    }
-
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(e => {
         if (e.isIntersecting) {
-          animateCounter(document.getElementById('count-triage'), 12400, '+');
-          animateCounter(document.getElementById('count-appt'), 8700, '+');
-          observer.disconnect();
+          e.target.classList.add('visible');
+          observer.unobserve(e.target);
         }
       });
-    }, { threshold: 0.3 });
-
-    const metricsEl = document.querySelector('.metrics');
-    if (metricsEl) observer.observe(metricsEl);
-
-    // Scroll reveal animations
-    const revealObserver = new IntersectionObserver((entries) => {
-      entries.forEach(e => {
-        if (e.isIntersecting) {
-          e.target.style.opacity = '1';
-          e.target.style.transform = 'translateY(0)';
-        }
-      });
-    }, { threshold: 0.1 });
-
-    document.querySelectorAll('.feature-card, .step, .role-card, .metric').forEach(el => {
-      el.style.opacity = '0';
-      el.style.transform = 'translateY(20px)';
-      el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-      revealObserver.observe(el);
-    });
+    }, { threshold: 0.08 });
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
   </script>
-
 </body>
 </html>

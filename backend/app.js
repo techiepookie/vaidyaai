@@ -86,10 +86,22 @@ function createApp() {
     message: { error: 'AI rate limit exceeded. Please wait before submitting again.' },
   });
 
-  // ── Root — redirect to health check ─────────────────────────
-  app.get('/', (_req, res) => {
-    res.redirect('/health');
-  });
+  // ── Serve static frontend assets (CSS, JS, images) ─────────────
+  const path   = require('path');
+  const PUBLIC = path.join(__dirname, 'public');
+  app.use(express.static(PUBLIC, { index: false }));
+
+  // ── HTML page routes ───────────────────────────────────
+  const sendPage = (file) => (_req, res) =>
+    res.sendFile(path.join(PUBLIC, file));
+
+  app.get('/',         sendPage('landing.html'));
+  app.get('/login',    sendPage('index.html'));
+  app.get('/patient',  sendPage('patient.html'));
+  app.get('/doctor',   sendPage('doctor.html'));
+
+  // ── Root — redirect if no public dir ──────────────────────
+  // (kept as fallback in case public/ isn't mounted)
 
   // ── Health check (no auth required) ───────────────────────────
   app.get('/health', (_req, res) => {

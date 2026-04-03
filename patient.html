@@ -322,7 +322,7 @@
       const results = await getTriageResults(currentUser.uid);
       if (!results.length) {
         container.innerHTML = `<div class="empty-state" style="margin-top:0">
-          <div class="empty-state__icon">📋</div>
+          <div class="empty-state__icon" style="font-family:var(--font-mono);font-size:1.5rem;opacity:0.3">[ ]</div>
           <div class="empty-state__title">No history yet</div>
           <p class="empty-state__text">Your AI triage results will appear here.</p>
         </div>`;

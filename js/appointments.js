@@ -74,9 +74,10 @@ async function renderAppointmentList() {
       <div class="appt-card__info">
         <div class="appt-card__name">${escapeHtml(appt.doctorName || 'Doctor')}</div>
         <div class="appt-card__meta">
-          ${escapeHtml(appt.specialty || '')} · 
+          ${escapeHtml(appt.specialty || '')} &middot;
           ${slot.toLocaleTimeString('en', {hour:'2-digit', minute:'2-digit'})}
         </div>
+        ${appt.notes ? `<div class="appt-card__notes" style="margin-top:6px;font-size:var(--text-xs);color:var(--c-grey-500);font-family:var(--font-mono);border-left:3px solid var(--c-grey-300);padding-left:8px">${escapeHtml(appt.notes)}</div>` : ''}
       </div>
       <span class="badge ${cfg.cls}">${cfg.label}</span>`;
     ul.appendChild(el);
@@ -122,7 +123,9 @@ async function populateDoctorSelect(select) {
   doctors.forEach(d => {
     const opt = document.createElement('option');
     opt.value = d.uid;
-    opt.textContent = `${d.name} — ${d.specialty || 'General'}`;
+    const exp  = d.experience ? ` · ${d.experience}` : '';
+    const hosp = d.hospital   ? ` @ ${d.hospital}` : '';
+    opt.textContent = `${d.name} — ${d.specialty || 'General'}${exp}${hosp}`;
     select.appendChild(opt);
   });
 }

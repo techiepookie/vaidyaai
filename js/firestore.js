@@ -11,9 +11,42 @@ import { DEMO_MODE, FB_SDK_VERSION, firebaseConfig } from './config.js';
 
 // ─── Demo seed data ───────────────────────────────────────────────
 export const MOCK_DOCTORS = [
-  { uid: 'demo-doctor-001', name: 'Dr. Priya Mehta',   specialty: 'General Medicine', available: true },
-  { uid: 'demo-doctor-002', name: 'Dr. Rajesh Kumar',  specialty: 'Cardiology',       available: true },
-  { uid: 'demo-doctor-003', name: 'Dr. Sunita Verma',  specialty: 'Neurology',        available: true },
+  {
+    uid: 'demo-doctor-001', name: 'Dr. Priya Mehta',
+    specialty: 'General Medicine', available: true,
+    hospital: 'Apollo Clinic, Indiranagar', experience: '12 years',
+    rating: 4.8, languages: ['English', 'Hindi'],
+  },
+  {
+    uid: 'demo-doctor-002', name: 'Dr. Rajesh Kumar',
+    specialty: 'Cardiology', available: true,
+    hospital: 'Fortis Healthcare, Cunningham Rd', experience: '18 years',
+    rating: 4.9, languages: ['English', 'Hindi', 'Kannada'],
+  },
+  {
+    uid: 'demo-doctor-003', name: 'Dr. Sunita Verma',
+    specialty: 'Neurology', available: true,
+    hospital: 'Manipal Hospital, HAL Airport Rd', experience: '15 years',
+    rating: 4.7, languages: ['English', 'Hindi'],
+  },
+  {
+    uid: 'demo-doctor-004', name: 'Dr. Arjun Nair',
+    specialty: 'Orthopedics', available: true,
+    hospital: 'Columbia Asia, Kirloskar Business Park', experience: '10 years',
+    rating: 4.6, languages: ['English', 'Malayalam'],
+  },
+  {
+    uid: 'demo-doctor-005', name: 'Dr. Kavitha Rao',
+    specialty: 'Dermatology', available: true,
+    hospital: 'Narayana Health City, Bommasandra', experience: '8 years',
+    rating: 4.8, languages: ['English', 'Kannada', 'Telugu'],
+  },
+  {
+    uid: 'demo-doctor-006', name: 'Dr. Mohammed Farouk',
+    specialty: 'Pulmonology', available: true,
+    hospital: 'Sakra World Hospital, Marathahalli', experience: '14 years',
+    rating: 4.9, languages: ['English', 'Hindi', 'Urdu'],
+  },
 ];
 
 const MOCK_TRIAGE_RESULTS = [
@@ -53,22 +86,39 @@ function getMockTriage() {
 
 function seedAppointments() {
   const now = new Date();
-  const tomorrow = new Date(now); tomorrow.setDate(now.getDate() + 1);
-  const nextWeek = new Date(now); nextWeek.setDate(now.getDate() + 7);
+  const d1 = new Date(now); d1.setDate(now.getDate() + 1);
+  const d2 = new Date(now); d2.setDate(now.getDate() + 3);
+  const d3 = new Date(now); d3.setDate(now.getDate() + 7);
+  const d4 = new Date(now); d4.setDate(now.getDate() - 5);
 
   return [
     {
       id: 'appt-001', patientId: 'demo-patient-001', doctorId: 'demo-doctor-001',
       doctorName: 'Dr. Priya Mehta', specialty: 'General Medicine',
-      slot: tomorrow.toISOString().replace(/T.*/, 'T10:00:00Z'),
+      slot: d1.toISOString().replace(/T.*/, 'T10:00:00.000Z'),
       status: 'confirmed', triageId: 'triage-001', notes: null,
       patientName: 'Arjun Sharma',
     },
     {
       id: 'appt-002', patientId: 'demo-patient-001', doctorId: 'demo-doctor-002',
       doctorName: 'Dr. Rajesh Kumar', specialty: 'Cardiology',
-      slot: nextWeek.toISOString().replace(/T.*/, 'T14:30:00Z'),
+      slot: d2.toISOString().replace(/T.*/, 'T11:30:00.000Z'),
       status: 'pending', triageId: null, notes: null,
+      patientName: 'Arjun Sharma',
+    },
+    {
+      id: 'appt-003', patientId: 'demo-patient-001', doctorId: 'demo-doctor-003',
+      doctorName: 'Dr. Sunita Verma', specialty: 'Neurology',
+      slot: d3.toISOString().replace(/T.*/, 'T15:00:00.000Z'),
+      status: 'pending', triageId: null, notes: null,
+      patientName: 'Arjun Sharma',
+    },
+    {
+      id: 'appt-004', patientId: 'demo-patient-001', doctorId: 'demo-doctor-004',
+      doctorName: 'Dr. Arjun Nair', specialty: 'Orthopedics',
+      slot: d4.toISOString().replace(/T.*/, 'T09:00:00.000Z'),
+      status: 'completed', triageId: null,
+      notes: 'Follow-up in 4 weeks. Continue physiotherapy. Prescribed ibuprofen 400mg for pain.',
       patientName: 'Arjun Sharma',
     },
   ];
@@ -94,15 +144,23 @@ async function getDb() {
  * @returns {Promise<Array<{uid,name,specialty,available}>>}
  */
 export async function getDoctors() {
-  if (DEMO_MODE) return MOCK_DOCTORS;
+  // Always use mock data for demo sessions (regardless of DEMO_MODE flag)
+  if (DEMO_MODE || sessionStorage.getItem('vaidyaai_demo_user')) return MOCK_DOCTORS;
 
-  const db = await getDb();
-  const { collection, query, where, getDocs } = await import(
-    `https://www.gstatic.com/firebasejs/${FB_SDK_VERSION}/firebase-firestore.js`
-  );
-  const q = query(collection(db, 'users'), where('role', '==', 'doctor'));
-  const snap = await getDocs(q);
-  return snap.docs.map(d => ({ uid: d.id, ...d.data() }));
+  try {
+    const db = await getDb();
+    const { collection, query, where, getDocs } = await import(
+      `https://www.gstatic.com/firebasejs/${FB_SDK_VERSION}/firebase-firestore.js`
+    );
+    const q = query(collection(db, 'users'), where('role', '==', 'doctor'));
+    const snap = await getDocs(q);
+    // Fall back to mock data if Firestore has no doctors yet
+    if (snap.empty) return MOCK_DOCTORS;
+    return snap.docs.map(d => ({ uid: d.id, ...d.data() }));
+  } catch {
+    // Network error or Firestore not set up — fall back gracefully
+    return MOCK_DOCTORS;
+  }
 }
 
 /**
@@ -112,20 +170,27 @@ export async function getDoctors() {
  * @returns {Promise<Array>}
  */
 export async function getAppointments(userId, role) {
-  if (DEMO_MODE) {
+  // Always use mock data for demo sessions
+  if (DEMO_MODE || sessionStorage.getItem('vaidyaai_demo_user')) {
     const all = getMockAppointments();
     const field = role === 'doctor' ? 'doctorId' : 'patientId';
     return all.filter(a => a[field] === userId).sort((a, b) => new Date(a.slot) - new Date(b.slot));
   }
 
-  const db = await getDb();
-  const { collection, query, where, getDocs, orderBy } = await import(
-    `https://www.gstatic.com/firebasejs/${FB_SDK_VERSION}/firebase-firestore.js`
-  );
-  const field = role === 'doctor' ? 'doctorId' : 'patientId';
-  const q = query(collection(db, 'appointments'), where(field, '==', userId), orderBy('slot', 'asc'));
-  const snap = await getDocs(q);
-  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  try {
+    const db = await getDb();
+    const { collection, query, where, getDocs, orderBy } = await import(
+      `https://www.gstatic.com/firebasejs/${FB_SDK_VERSION}/firebase-firestore.js`
+    );
+    const field = role === 'doctor' ? 'doctorId' : 'patientId';
+    const q = query(collection(db, 'appointments'), where(field, '==', userId), orderBy('slot', 'asc'));
+    const snap = await getDocs(q);
+    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  } catch {
+    const all = getMockAppointments();
+    const field = role === 'doctor' ? 'doctorId' : 'patientId';
+    return all.filter(a => a[field] === userId).sort((a, b) => new Date(a.slot) - new Date(b.slot));
+  }
 }
 
 /**
@@ -134,21 +199,26 @@ export async function getAppointments(userId, role) {
  * @returns {Promise<Array>}
  */
 export async function getTriageResults(patientId) {
-  if (DEMO_MODE) {
+  // Always use mock data for demo sessions
+  if (DEMO_MODE || sessionStorage.getItem('vaidyaai_demo_user')) {
     return getMockTriage().filter(t => t.patientId === patientId);
   }
 
-  const db = await getDb();
-  const { collection, query, where, getDocs, orderBy } = await import(
-    `https://www.gstatic.com/firebasejs/${FB_SDK_VERSION}/firebase-firestore.js`
-  );
-  const q = query(
-    collection(db, 'triage_results'),
-    where('patientId', '==', patientId),
-    orderBy('createdAt', 'desc')
-  );
-  const snap = await getDocs(q);
-  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  try {
+    const db = await getDb();
+    const { collection, query, where, getDocs, orderBy } = await import(
+      `https://www.gstatic.com/firebasejs/${FB_SDK_VERSION}/firebase-firestore.js`
+    );
+    const q = query(
+      collection(db, 'triage_results'),
+      where('patientId', '==', patientId),
+      orderBy('createdAt', 'desc')
+    );
+    const snap = await getDocs(q);
+    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  } catch {
+    return getMockTriage().filter(t => t.patientId === patientId);
+  }
 }
 
 /**

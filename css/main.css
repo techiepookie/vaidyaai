@@ -448,13 +448,16 @@ h1,h2,h3,h4,h5,h6 { font-family: var(--font-mono); font-weight: 600; line-height
 .slot-btn:disabled { background: var(--c-grey-100); color: var(--c-grey-300); cursor: not-allowed; text-decoration: line-through; }
 
 /* ─── Clinic Finder ─────────────────────────────────────────── */
-.clinic-layout { display: grid; grid-template-columns: 300px 1fr; border: var(--border); height: 480px; }
+.clinic-layout { display: grid; grid-template-columns: 300px 1fr; border: var(--border); height: 520px; }
 .clinic-list { border-right: var(--border); overflow-y: auto; background: var(--c-white); }
-.clinic-item { padding: var(--sp-4) var(--sp-5); border-bottom: var(--border-hairline); cursor: pointer; transition: background var(--ease); }
+.clinic-item { display: block; width: 100%; text-align: left; padding: var(--sp-4) var(--sp-5); border-bottom: var(--border-hairline); cursor: pointer; transition: background var(--ease); }
 .clinic-item:hover, .clinic-item[data-selected="true"] { background: var(--c-grey-100); }
 .clinic-item__name { font-family: var(--font-mono); font-size: var(--text-sm); font-weight: 600; margin-bottom: 2px; }
 .clinic-item__type { font-size: var(--text-xs); color: var(--c-accent); font-family: var(--font-mono); margin-bottom: 2px; }
-.clinic-item__address { font-size: var(--text-xs); color: var(--c-grey-500); }
+.clinic-item__address { font-size: var(--text-xs); color: var(--c-grey-500); margin-bottom: 4px; }
+.clinic-item__meta { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-2); }
+.clinic-item__hours { font-family: var(--font-mono); font-size: 0.6rem; color: var(--c-grey-500); letter-spacing: 0.03em; }
+.clinic-item__rating { font-family: var(--font-mono); font-size: 0.65rem; color: #C8A030; white-space: nowrap; }
 .clinic-map-container { position: relative; overflow: hidden; background: var(--c-grey-100); }
 .clinic-map { width: 100%; height: 100%; border: none; }
 .clinic-map-placeholder {
@@ -463,6 +466,15 @@ h1,h2,h3,h4,h5,h6 { font-family: var(--font-mono); font-weight: 600; line-height
   font-family: var(--font-mono); font-size: var(--text-sm); text-align: center; padding: var(--sp-8);
 }
 .clinic-map-placeholder__icon { font-size: 3rem; }
+/* Leaflet popup brutalist override */
+.leaflet-popup-content-wrapper {
+  border-radius: 0 !important;
+  border: 2px solid #0A0A0A !important;
+  box-shadow: 4px 4px 0 rgba(0,0,0,0.2) !important;
+  padding: 0 !important;
+}
+.leaflet-popup-content { margin: 10px 14px !important; }
+.leaflet-popup-tip { background: #0A0A0A !important; }
 
 /* ─── Modal ─────────────────────────────────────────────────── */
 .modal-overlay {

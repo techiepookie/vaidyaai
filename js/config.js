@@ -40,7 +40,7 @@ export const firebaseConfig = {
  * Leave as empty string to use mock data (DEMO_MODE auto-enables).
  * @type {string}
  */
-export const CLOUD_RUN_BASE_URL = "";
+export const CLOUD_RUN_BASE_URL = "https://vaidyaai-565232619347.europe-west1.run.app";
 
 /**
  * Google Maps JavaScript API key.

@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="VaidyaAI Patient Dashboard — check your symptoms with Gemini AI, book appointments, and find nearby clinics." />
+  <title>VaidyaAI — Patient Dashboard</title>
+  <link rel="stylesheet" href="css/main.css" />
+</head>
+<body>
+  <a href="#main" class="skip-link">Skip to content</a>
+
+  <div class="dashboard-layout">
+
+    <!-- ── Header ──────────────────────────────────────────── -->
+    <header class="dash-header" role="banner">
+      <div class="dash-header__inner">
+        <div class="dash-header__logo">
+          <span class="logo-hindi">वैद्य</span>AI
+        </div>
+        <div class="dash-header__meta">
+          <div class="dash-header__user">
+            Logged in as <strong id="header-user-name">Loading…</strong>
+          </div>
+          <span class="dash-role-tag">Patient</span>
+          <button class="btn btn--ghost-light btn--sm" id="logout-btn" type="button">
+            Log Out
+          </button>
+        </div>
+      </div>
+
+      <!-- Tab navigation -->
+      <nav class="tab-nav" aria-label="Patient dashboard sections">
+        <div class="tab-nav__list" role="tablist">
+          <button class="tab-nav__btn" role="tab" aria-selected="true"  data-tab="tab-appointments" id="nav-appointments">
+            <span class="tab-nav__icon" aria-hidden="true">📅</span> Appointments
+          </button>
+          <button class="tab-nav__btn" role="tab" aria-selected="false" data-tab="tab-symptom"      id="nav-symptom" tabindex="-1">
+            <span class="tab-nav__icon" aria-hidden="true">⭐</span> Symptom Checker
+          </button>
+          <button class="tab-nav__btn" role="tab" aria-selected="false" data-tab="tab-maps"         id="nav-maps" tabindex="-1">
+            <span class="tab-nav__icon" aria-hidden="true">🗺️</span> Clinic Finder
+          </button>
+          <button class="tab-nav__btn" role="tab" aria-selected="false" data-tab="tab-profile"      id="nav-profile" tabindex="-1">
+            <span class="tab-nav__icon" aria-hidden="true">👤</span> Profile
+          </button>
+        </div>
+      </nav>
+    </header>
+
+    <!-- ── Demo Banner ─────────────────────────────────────── -->
+    <div id="demo-banner" class="status-banner status-banner--demo hidden" role="note">
+      <span aria-hidden="true">⚠</span>
+      Demo Mode — using mock data. Add Firebase credentials in js/config.js for live features.
+    </div>
+
+    <!-- ── Main ────────────────────────────────────────────── -->
+    <main id="main" class="dash-main">
+
+      <!-- ─── Tab: Appointments ─────────────────────────────── -->
+      <section id="tab-appointments"
+               class="tab-panel"
+               role="tabpanel"
+               aria-labelledby="nav-appointments"
+               data-active="true">
+
+        <div class="section-header">
+          <div>
+            <h2 class="section-title">My Appointments</h2>
+            <p class="section-subtitle">Upcoming and past consultations</p>
+          </div>
+        </div>
+
+        <!-- Stats row -->
+        <div class="stats-row" aria-label="Appointment statistics">
+          <div class="stat-item">
+            <div class="stat-item__value" id="stat-upcoming">0</div>
+            <div class="stat-item__label">Upcoming</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-item__value" id="stat-confirmed">0</div>
+            <div class="stat-item__label">Confirmed</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-item__value" id="stat-past">0</div>
+            <div class="stat-item__label">Completed</div>
+          </div>
+        </div>
+
+        <!-- Appointments list -->
+        <div id="appt-list" aria-label="Appointment list" aria-live="polite"></div>
+
+        <!-- ─ Book Appointment Form ────────────────────────── -->
+        <div style="margin-top:var(--sp-10)">
+          <div class="section-header">
+            <div>
+              <h3 class="section-title" style="font-size:var(--text-xl)">Book New Appointment</h3>
+              <p class="section-subtitle">Select a doctor and pick an available time slot</p>
+            </div>
+          </div>
+
+          <form id="booking-form" class="booking-wizard" novalidate>
+            <div class="form-group">
+              <label class="form-label" for="booking-doctor">Select Doctor</label>
+              <select class="form-select" id="booking-doctor" name="doctorId" required>
+                <option value="">— Select a doctor —</option>
+              </select>
+            </div>
+
+            <div id="booking-slots-section" class="hidden">
+              <div class="form-group">
+                <label class="form-label">Available Time Slots</label>
+                <div id="slot-grid" class="slot-grid" role="group" aria-label="Available appointment slots"></div>
+              </div>
+            </div>
+
+            <div style="margin-top:var(--sp-6)">
+              <button type="submit"
+                      id="booking-confirm"
+                      class="btn btn--primary"
+                      disabled>
+                Confirm Appointment
+              </button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- ─── Tab: Symptom Checker ──────────────────────────── -->
+      <section id="tab-symptom"
+               class="tab-panel"
+               role="tabpanel"
+               aria-labelledby="nav-symptom">
+
+        <div class="section-header">
+          <div>
+            <h2 class="section-title">AI Symptom Checker</h2>
+            <p class="section-subtitle">Describe your symptoms — Gemini 2.5 Pro will triage them instantly</p>
+          </div>
+          <span class="badge badge--doctor">Powered by Vertex AI</span>
+        </div>
+
+        <div class="symptom-checker">
+          <div class="symptom-checker__info" role="note">
+            <span aria-hidden="true">ℹ</span>
+            <span>You can write in English, Hindi, or Hinglish. This is a first-response AI — always consult a doctor for medical decisions.</span>
+          </div>
+
+          <form id="symptom-form" novalidate>
+            <div class="form-group">
+              <label class="form-label" for="symptom-input">Describe your symptoms</label>
+              <div class="symptom-checker__textarea-wrap">
+                <textarea class="form-textarea"
+                          id="symptom-input"
+                          name="symptoms"
+                          rows="6"
+                          maxlength="2000"
+                          required
+                          placeholder="E.g. I have had a severe headache for the last 2 hours, and my vision seems blurry…"></textarea>
+                <span class="symptom-checker__char-count" id="symptom-char-count" aria-live="off">0 / 2000</span>
+              </div>
+            </div>
+            <button type="submit" id="symptom-submit" class="btn btn--primary">
+              Analyse Symptoms
+            </button>
+          </form>
+
+          <!-- Loading state -->
+          <div id="symptom-loading"
+               class="symptom-loading"
+               role="status"
+               aria-live="polite"
+               data-visible="false">
+            <div class="symptom-loading__spinner" aria-hidden="true"></div>
+            Analysing with Gemini 2.5 Pro…
+          </div>
+
+          <!-- Live region for screen reader announcements -->
+          <div id="symptom-live" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+
+          <!-- Triage result injected here -->
+          <div id="symptom-result" style="margin-top:var(--sp-6)"></div>
+
+          <!-- Previous triage history -->
+          <div style="margin-top:var(--sp-10)">
+            <div class="section-header">
+              <div>
+                <h3 class="section-title" style="font-size:var(--text-xl)">Triage History</h3>
+                <p class="section-subtitle">Your previous AI assessments</p>
+              </div>
+            </div>
+            <div id="triage-history" aria-live="polite"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─── Tab: Clinic Finder ────────────────────────────── -->
+      <section id="tab-maps"
+               class="tab-panel"
+               role="tabpanel"
+               aria-labelledby="nav-maps">
+
+        <div class="section-header">
+          <div>
+            <h2 class="section-title">Clinic Finder</h2>
+            <p class="section-subtitle">Nearby hospitals and clinics — click a location for details</p>
+          </div>
+        </div>
+
+        <div class="clinic-layout">
+          <div id="clinic-list" class="clinic-list" role="list" aria-label="Nearby clinics"></div>
+          <div id="clinic-map-container" class="clinic-map-container" aria-label="Clinic locations map"></div>
+        </div>
+      </section>
+
+      <!-- ─── Tab: Profile ──────────────────────────────────── -->
+      <section id="tab-profile"
+               class="tab-panel"
+               role="tabpanel"
+               aria-labelledby="nav-profile">
+
+        <div class="section-header">
+          <div>
+            <h2 class="section-title">My Profile</h2>
+            <p class="section-subtitle">Update your personal information</p>
+          </div>
+        </div>
+
+        <form id="profile-form" class="profile-form" novalidate>
+          <div class="profile-avatar-row">
+            <div class="avatar-circle" id="avatar-initials" aria-hidden="true">A</div>
+            <div>
+              <div class="text-mono fw-700" style="font-size:var(--text-lg)" id="profile-name-display">Loading…</div>
+              <div class="text-muted text-sm text-mono" id="profile-role-display">Patient</div>
+            </div>
+          </div>
+
+          <div class="profile-form__row">
+            <div class="form-group">
+              <label class="form-label" for="profile-name">Full Name</label>
+              <input class="form-input" type="text" id="profile-name" name="name" autocomplete="name" required />
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="profile-dob">Date of Birth</label>
+              <input class="form-input" type="date" id="profile-dob" name="dob" autocomplete="bday" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="profile-email">Email Address</label>
+            <input class="form-input" type="email" id="profile-email" name="email" autocomplete="email" readonly
+                   style="background:var(--c-grey-100);cursor:not-allowed" />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="profile-phone">Phone Number</label>
+            <input class="form-input" type="tel" id="profile-phone" name="phone" autocomplete="tel"
+                   placeholder="+91-XXXXXXXXXX" />
+          </div>
+
+          <div id="profile-alert" class="auth-alert" role="alert" aria-live="polite" data-visible="false"></div>
+
+          <div>
+            <button type="submit" id="profile-save" class="btn btn--secondary">Save Changes</button>
+          </div>
+        </form>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Toast container -->
+  <div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="false"></div>
+
+  <script type="module">
+    import { requireAuth, logout } from './js/auth.js';
+    import { getTriageResults, updateUserProfile } from './js/firestore.js';
+    import { initSymptomChecker } from './js/symptom.js';
+    import { initAppointments }   from './js/appointments.js';
+    import { initClinicFinder }   from './js/maps.js';
+    import { initTabs, showToast } from './js/ui.js';
+    import { DEMO_MODE } from './js/config.js';
+
+    // ── Route guard ───────────────────────────────────────────
+    let currentUser;
+    try {
+      currentUser = await requireAuth('patient');
+    } catch { /* requireAuth handles redirect */ }
+
+    // ── Demo banner ───────────────────────────────────────────
+    if (DEMO_MODE) document.getElementById('demo-banner').classList.remove('hidden');
+
+    // ── Populate header ───────────────────────────────────────
+    document.getElementById('header-user-name').textContent = currentUser.name;
+    document.getElementById('logout-btn').addEventListener('click', logout);
+
+    // ── Populate profile form ─────────────────────────────────
+    document.getElementById('profile-name').value    = currentUser.name || '';
+    document.getElementById('profile-email').value   = currentUser.email || '';
+    document.getElementById('profile-dob').value     = currentUser.dob || '';
+    document.getElementById('profile-phone').value   = currentUser.phone || '';
+    document.getElementById('profile-name-display').textContent = currentUser.name;
+    document.getElementById('avatar-initials').textContent = (currentUser.name || 'P')[0].toUpperCase();
+
+    // ── Tab switching ─────────────────────────────────────────
+    initTabs('main', '.tab-panel');
+
+    // ── Lazy-load Maps when tab activates ────────────────────
+    let mapsLoaded = false;
+    document.getElementById('nav-maps').addEventListener('click', async () => {
+      if (!mapsLoaded) { mapsLoaded = true; await initClinicFinder(); }
+    });
+
+    // ── Symptoms ──────────────────────────────────────────────
+    initSymptomChecker({ userId: currentUser.uid });
+
+    // ── Triage history ────────────────────────────────────────
+    async function loadTriageHistory() {
+      const container = document.getElementById('triage-history');
+      if (!container) return;
+      const results = await getTriageResults(currentUser.uid);
+      if (!results.length) {
+        container.innerHTML = `<div class="empty-state" style="margin-top:0">
+          <div class="empty-state__icon">📋</div>
+          <div class="empty-state__title">No history yet</div>
+          <p class="empty-state__text">Your AI triage results will appear here.</p>
+        </div>`;
+        return;
+      }
+      const URGENCY_MAP = {
+        low:      { cls:'badge--low',      icon:'✓', label:'Low — Self-care' },
+        moderate: { cls:'badge--moderate', icon:'!', label:'Moderate — See Doctor' },
+        high:     { cls:'badge--high',     icon:'‼', label:'High — Urgent' },
+      };
+      container.innerHTML = results.slice(0,5).map(t => {
+        const cfg = URGENCY_MAP[t.urgency] || URGENCY_MAP.moderate;
+        const date = t.createdAt ? new Date(t.createdAt).toLocaleDateString('en',{day:'numeric',month:'short',year:'numeric'}) : '';
+        return `<div class="card card--spaced animate-fade-in" style="border-left:4px solid var(--c-${t.urgency === 'high' ? 'accent' : t.urgency === 'moderate' ? 'moderate' : 'low'})">
+          <div class="flex justify-between items-center mb-4">
+            <span class="text-xs text-muted text-mono">${date}</span>
+            <span class="badge ${cfg.cls}"><span aria-hidden="true">${cfg.icon}</span> ${cfg.label}</span>
+          </div>
+          <p class="text-sm" style="color:var(--c-grey-700);font-style:italic;margin-bottom:var(--sp-3)">"${t.symptoms?.slice(0,140)}…"</p>
+          <p class="text-sm">${t.advice || ''}</p>
+        </div>`;
+      }).join('');
+    }
+    await loadTriageHistory();
+
+    // ── Appointments ──────────────────────────────────────────
+    const lastTriage = sessionStorage.getItem('vaidyaai_last_triage_id');
+    await initAppointments({ userId: currentUser.uid, lastTriageId: lastTriage });
+
+    // Update stats
+    async function updateStats() {
+      const { getAppointments } = await import('./js/firestore.js');
+      const appts = await getAppointments(currentUser.uid, 'patient');
+      document.getElementById('stat-upcoming').textContent  = appts.filter(a => a.status !== 'completed').length;
+      document.getElementById('stat-confirmed').textContent = appts.filter(a => a.status === 'confirmed').length;
+      document.getElementById('stat-past').textContent      = appts.filter(a => a.status === 'completed').length;
+    }
+    await updateStats();
+
+    // ── Profile save ──────────────────────────────────────────
+    document.getElementById('profile-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('profile-save');
+      btn.setAttribute('data-loading','true'); btn.disabled = true;
+      const alertEl = document.getElementById('profile-alert');
+      alertEl.setAttribute('data-visible','false');
+
+      const name  = document.getElementById('profile-name').value.trim();
+      const dob   = document.getElementById('profile-dob').value;
+      const phone = document.getElementById('profile-phone').value.trim();
+
+      try {
+        await updateUserProfile(currentUser.uid, { name, dob, phone });
+        document.getElementById('profile-name-display').textContent = name;
+        document.getElementById('avatar-initials').textContent = name[0]?.toUpperCase() || 'P';
+        document.getElementById('header-user-name').textContent = name;
+        showToast('Profile updated successfully.', 'success');
+      } catch (err) {
+        alertEl.textContent = err.message || 'Failed to save changes.';
+        alertEl.setAttribute('data-visible','true');
+      } finally {
+        btn.removeAttribute('data-loading'); btn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

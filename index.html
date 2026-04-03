@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="VaidyaAI — AI-powered doctor and patient management platform. Log in or sign up to access Gemini-powered symptom triage and smart appointment booking." />
+  <title>VaidyaAI — वैद्य AI · Login</title>
+  <link rel="stylesheet" href="css/main.css" />
+</head>
+<body>
+  <!-- Skip to main content (WCAG 2.1 requirement) -->
+  <a href="#main" class="skip-link">Skip to content</a>
+
+  <div class="auth-layout">
+    <!-- ── Left: Brand Panel ────────────────────────────────── -->
+    <div class="auth-brand" aria-hidden="true">
+      <div class="auth-brand__inner">
+        <div class="auth-brand__wordmark">
+          <span class="auth-brand__hindi">वैद्य</span>
+          <span class="auth-brand__name">VaidyaAI</span>
+        </div>
+        <p class="auth-brand__tagline">
+          Every patient heard.<br>Every doctor prepared.
+        </p>
+        <ul class="auth-brand__features">
+          <li>AI symptom triage via Gemini 2.5 Pro</li>
+          <li>Real-time doctor queue with onSnapshot</li>
+          <li>Smart appointment booking</li>
+          <li>Clinic finder powered by Google Maps</li>
+        </ul>
+        <div class="auth-brand__services">
+          <span class="service-pill">Firebase Auth</span>
+          <span class="service-pill">Firestore</span>
+          <span class="service-pill">Cloud Run</span>
+          <span class="service-pill">Vertex AI</span>
+          <span class="service-pill">Maps API</span>
+          <span class="service-pill">Hosting</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Right: Auth Form Panel ───────────────────────────── -->
+    <main id="main" class="auth-form-panel">
+      <div class="auth-form-panel__inner">
+
+        <!-- Tab switcher: Login / Sign Up -->
+        <div class="auth-tabs" role="tablist" aria-label="Authentication options">
+          <button class="auth-tab-btn"
+                  id="tab-login"
+                  role="tab"
+                  aria-selected="true"
+                  aria-controls="panel-login"
+                  data-auth-tab="login">
+            Log In
+          </button>
+          <button class="auth-tab-btn"
+                  id="tab-signup"
+                  role="tab"
+                  aria-selected="false"
+                  aria-controls="panel-signup"
+                  tabindex="-1"
+                  data-auth-tab="signup">
+            Sign Up
+          </button>
+        </div>
+
+        <!-- Error live region -->
+        <div id="auth-alert"
+             class="auth-alert"
+             role="alert"
+             aria-live="assertive"
+             data-visible="false">
+        </div>
+
+        <!-- ── Login Panel ──────────────────────────────────── -->
+        <div id="panel-login" role="tabpanel" aria-labelledby="tab-login">
+          <form id="login-form" class="auth-form" novalidate>
+            <div>
+              <h1 class="auth-form__title">Welcome back</h1>
+              <p class="auth-form__subtitle">Log in to your VaidyaAI account.</p>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="login-email">Email address</label>
+              <input class="form-input"
+                     type="email"
+                     id="login-email"
+                     name="email"
+                     autocomplete="email"
+                     required
+                     placeholder="you@example.com" />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="login-password">Password</label>
+              <input class="form-input"
+                     type="password"
+                     id="login-password"
+                     name="password"
+                     autocomplete="current-password"
+                     required
+                     placeholder="••••••••" />
+            </div>
+
+            <button type="submit" id="login-submit" class="btn btn--primary w-full">
+              Log In
+            </button>
+
+            <p class="auth-form__footer">
+              Demo: <strong>patient@demo.com</strong> or <strong>doctor@demo.com</strong>
+              / any 6+ character password
+            </p>
+          </form>
+        </div>
+
+        <!-- ── Sign Up Panel ────────────────────────────────── -->
+        <div id="panel-signup" role="tabpanel" aria-labelledby="tab-signup" hidden>
+          <form id="signup-form" class="auth-form" novalidate>
+            <div>
+              <h1 class="auth-form__title">Create account</h1>
+              <p class="auth-form__subtitle">Join VaidyaAI as a patient or doctor.</p>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="signup-name">Full name</label>
+              <input class="form-input"
+                     type="text"
+                     id="signup-name"
+                     name="name"
+                     autocomplete="name"
+                     required
+                     placeholder="Your full name" />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="signup-email">Email address</label>
+              <input class="form-input"
+                     type="email"
+                     id="signup-email"
+                     name="email"
+                     autocomplete="email"
+                     required
+                     placeholder="you@example.com" />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="signup-password">Password</label>
+              <input class="form-input"
+                     type="password"
+                     id="signup-password"
+                     name="password"
+                     autocomplete="new-password"
+                     required
+                     minlength="6"
+                     placeholder="Minimum 6 characters" />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" id="role-label">I am a</label>
+              <div class="role-toggle" role="group" aria-labelledby="role-label">
+                <button type="button"
+                        class="role-toggle__btn"
+                        id="role-patient"
+                        aria-pressed="true"
+                        data-role="patient">
+                  🧑‍⚕️ Patient
+                </button>
+                <button type="button"
+                        class="role-toggle__btn"
+                        id="role-doctor"
+                        aria-pressed="false"
+                        data-role="doctor">
+                  👨‍⚕️ Doctor
+                </button>
+              </div>
+              <input type="hidden" id="signup-role" value="patient" />
+            </div>
+
+            <button type="submit" id="signup-submit" class="btn btn--primary w-full">
+              Create Account
+            </button>
+
+            <p class="auth-form__footer">
+              By signing up you agree to use this app responsibly.
+              VaidyaAI AI output is not a medical diagnosis.
+            </p>
+          </form>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="false"></div>
+
+  <script type="module">
+    import { login, signup } from './js/auth.js';
+
+    // ── Tab switching ──────────────────────────────────────────
+    const tabs      = document.querySelectorAll('[data-auth-tab]');
+    const loginPane  = document.getElementById('panel-login');
+    const signupPane = document.getElementById('panel-signup');
+
+    function showTab(tab) {
+      const isLogin = tab === 'login';
+      document.getElementById('tab-login').setAttribute('aria-selected', String(isLogin));
+      document.getElementById('tab-signup').setAttribute('aria-selected', String(!isLogin));
+      document.getElementById('tab-login').tabIndex  = isLogin ? 0 : -1;
+      document.getElementById('tab-signup').tabIndex = isLogin ? -1 : 0;
+      loginPane.hidden  = !isLogin;
+      signupPane.hidden = isLogin;
+      clearAlert();
+    }
+
+    tabs.forEach(btn => {
+      btn.addEventListener('click', () => showTab(btn.dataset.authTab));
+      btn.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight') { e.preventDefault(); showTab('signup'); document.getElementById('tab-signup').focus(); }
+        if (e.key === 'ArrowLeft')  { e.preventDefault(); showTab('login');  document.getElementById('tab-login').focus(); }
+      });
+    });
+
+    // ── Role toggle ────────────────────────────────────────────
+    const roleInput = document.getElementById('signup-role');
+    document.querySelectorAll('.role-toggle__btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.role-toggle__btn').forEach(b => b.setAttribute('aria-pressed','false'));
+        btn.setAttribute('aria-pressed','true');
+        roleInput.value = btn.dataset.role;
+      });
+    });
+
+    // ── Alert helpers ──────────────────────────────────────────
+    function showAlert(msg) {
+      const el = document.getElementById('auth-alert');
+      el.textContent = msg;
+      el.setAttribute('data-visible','true');
+    }
+    function clearAlert() {
+      const el = document.getElementById('auth-alert');
+      el.textContent = '';
+      el.setAttribute('data-visible','false');
+    }
+
+    function setLoading(btnId, on) {
+      const btn = document.getElementById(btnId);
+      btn.setAttribute('data-loading', String(on));
+      btn.disabled = on;
+    }
+
+    // ── Login submit ───────────────────────────────────────────
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      clearAlert();
+      const email    = document.getElementById('login-email').value.trim();
+      const password = document.getElementById('login-password').value;
+      if (!email || !password) { showAlert('Please enter your email and password.'); return; }
+
+      setLoading('login-submit', true);
+      try {
+        const user = await login(email, password);
+        window.location.href = user.role === 'doctor' ? '/doctor.html' : '/patient.html';
+      } catch (err) {
+        showAlert(err.message || 'Login failed. Please try again.');
+        setLoading('login-submit', false);
+      }
+    });
+
+    // ── Signup submit ──────────────────────────────────────────
+    document.getElementById('signup-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      clearAlert();
+      const name     = document.getElementById('signup-name').value.trim();
+      const email    = document.getElementById('signup-email').value.trim();
+      const password = document.getElementById('signup-password').value;
+      const role     = document.getElementById('signup-role').value;
+
+      if (!name)  { showAlert('Please enter your full name.'); return; }
+      if (!email) { showAlert('Please enter your email address.'); return; }
+      if (password.length < 6) { showAlert('Password must be at least 6 characters.'); return; }
+
+      setLoading('signup-submit', true);
+      try {
+        const user = await signup(name, email, password, role);
+        window.location.href = user.role === 'doctor' ? '/doctor.html' : '/patient.html';
+      } catch (err) {
+        showAlert(err.message || 'Sign up failed. Please try again.');
+        setLoading('signup-submit', false);
+      }
+    });
+  </script>
+</body>
+</html>

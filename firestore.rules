@@ -1,0 +1,74 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Helper functions ──────────────────────────────────────
+
+    /** Returns true if the caller is authenticated */
+    function isAuth() {
+      return request.auth != null;
+    }
+
+    /** Returns true if the caller owns the given uid */
+    function isOwner(uid) {
+      return isAuth() && request.auth.uid == uid;
+    }
+
+    /** Returns true if the incoming data has the expected role */
+    function hasRole(role) {
+      return isAuth() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == role;
+    }
+
+    // ── users/{uid} ───────────────────────────────────────────
+    // A user can only read and write their own profile document.
+    match /users/{uid} {
+      allow read:  if isOwner(uid);
+      allow create: if isOwner(uid)
+                    && request.resource.data.role in ['patient', 'doctor']
+                    && request.resource.data.email is string
+                    && request.resource.data.name is string;
+      allow update: if isOwner(uid)
+                    // Role must not change after creation
+                    && request.resource.data.role == resource.data.role;
+      allow delete: if false; // Accounts cannot be self-deleted
+    }
+
+    // ── appointments/{appointmentId} ──────────────────────────
+    // Patient: can create and read their own appointments.
+    // Doctor:  can read appointments assigned to them and update (add notes).
+    // Neither can delete.
+    match /appointments/{apptId} {
+      allow read:  if isAuth()
+                   && (request.auth.uid == resource.data.patientId
+                       || request.auth.uid == resource.data.doctorId);
+
+      allow create: if isAuth()
+                    && request.auth.uid == request.resource.data.patientId
+                    && request.resource.data.status == 'pending'
+                    && request.resource.data.slot is string
+                    && request.resource.data.doctorId is string;
+
+      allow update: if isAuth()
+                    && (request.auth.uid == resource.data.doctorId
+                        || request.auth.uid == resource.data.patientId)
+                    // patientId and doctorId must not change
+                    && request.resource.data.patientId == resource.data.patientId
+                    && request.resource.data.doctorId  == resource.data.doctorId;
+
+      allow delete: if false;
+    }
+
+    // ── triage_results/{triageId} ─────────────────────────────
+    // Only the patient can read their own triage results.
+    // Doctor can read triage results for their patients via the appointment link.
+    // WRITE is handled exclusively by the Cloud Run backend (service account).
+    // Firestore client SDK cannot write to this collection.
+    match /triage_results/{triageId} {
+      allow read: if isAuth()
+                  && request.auth.uid == resource.data.patientId;
+      allow write: if false; // Server-side only via Cloud Run + Admin SDK
+    }
+
+  }
+}

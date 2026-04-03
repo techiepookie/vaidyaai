@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="VaidyaAI Doctor Dashboard — view real-time patient queue, AI triage pre-assessments, and manage appointment notes." />
+  <title>VaidyaAI — Doctor Dashboard</title>
+  <link rel="stylesheet" href="css/main.css" />
+</head>
+<body>
+  <a href="#main" class="skip-link">Skip to content</a>
+
+  <div class="dashboard-layout">
+
+    <!-- ── Header ──────────────────────────────────────────── -->
+    <header class="dash-header" role="banner">
+      <div class="dash-header__inner">
+        <div class="dash-header__logo">
+          <span class="logo-hindi">वैद्य</span>AI
+        </div>
+        <div class="dash-header__meta">
+          <div class="dash-header__user">
+            Dr. <strong id="header-user-name">Loading…</strong>
+          </div>
+          <span class="dash-role-tag">Doctor</span>
+          <button class="btn btn--ghost-light btn--sm" id="logout-btn" type="button">
+            Log Out
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- ── Demo Banner ─────────────────────────────────────── -->
+    <div id="demo-banner" class="status-banner status-banner--demo hidden" role="note">
+      <span aria-hidden="true">⚠</span>
+      Demo Mode — real-time Firestore listener simulated. Add Firebase credentials in js/config.js for live updates.
+    </div>
+
+    <!-- ── Main ────────────────────────────────────────────── -->
+    <main id="main" class="dash-main">
+
+      <!-- Page header with date + stats -->
+      <div class="section-header">
+        <div>
+          <h1 class="section-title">Today's Queue</h1>
+          <p class="section-subtitle" id="queue-date">Loading date…</p>
+        </div>
+        <div style="display:flex;align-items:center;gap:var(--sp-3)">
+          <span id="live-indicator"
+                style="display:flex;align-items:center;gap:var(--sp-2);font-family:var(--font-mono);font-size:var(--text-xs);color:var(--c-low)"
+                aria-label="Real-time updates active">
+            <span style="width:8px;height:8px;border-radius:50%;background:var(--c-low);animation:spin 2s linear infinite" aria-hidden="true"></span>
+            LIVE
+          </span>
+        </div>
+      </div>
+
+      <!-- Stats row -->
+      <div class="stats-row" aria-label="Queue statistics">
+        <div class="stat-item">
+          <div class="stat-item__value" id="stat-total">0</div>
+          <div class="stat-item__label">In Queue</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-item__value" id="stat-urgent" style="color:var(--c-high)">0</div>
+          <div class="stat-item__label">High Urgency</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-item__value" id="stat-completed">0</div>
+          <div class="stat-item__label">Completed Today</div>
+        </div>
+      </div>
+
+      <!-- Live region for queue changes -->
+      <div id="queue-live" class="sr-only" aria-live="polite" aria-atomic="false"></div>
+
+      <!-- Queue list — Firestore onSnapshot populates this -->
+      <div id="queue-list"
+           class="queue-list"
+           aria-label="Patient appointment queue"
+           aria-live="polite">
+        <p class="text-muted text-sm text-mono" style="padding:var(--sp-4)">Loading queue…</p>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- ── Notes Modal ──────────────────────────────────────────── -->
+  <div id="notes-modal-overlay"
+       class="modal-overlay"
+       role="dialog"
+       aria-modal="true"
+       aria-labelledby="notes-modal-title"
+       aria-hidden="true"
+       data-open="false">
+    <div class="modal">
+      <div class="modal__header">
+        <h2 class="modal__title" id="notes-modal-title">
+          Consultation Notes — <span id="notes-patient-name">Patient</span>
+        </h2>
+        <button class="modal__close"
+                id="notes-modal-close"
+                type="button"
+                aria-label="Close notes modal">
+          ✕
+        </button>
+      </div>
+      <div class="modal__body">
+        <div class="form-group">
+          <label class="form-label" for="notes-textarea">
+            Consultation Notes
+          </label>
+          <textarea class="form-textarea"
+                    id="notes-textarea"
+                    name="notes"
+                    rows="5"
+                    placeholder="Add consultation notes, diagnosis, prescriptions, follow-up instructions…"
+                    maxlength="2000"></textarea>
+        </div>
+        <p class="text-xs text-muted text-mono" style="margin-top:var(--sp-3)">
+          Saving this will mark the appointment as <strong>Completed</strong>.
+        </p>
+      </div>
+      <div class="modal__footer">
+        <button class="btn btn--ghost btn--sm" id="notes-cancel" type="button">Cancel</button>
+        <button class="btn btn--primary btn--sm" id="notes-save" type="button">Save &amp; Complete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast container -->
+  <div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="false"></div>
+
+  <script type="module">
+    import { requireAuth, logout }   from './js/auth.js';
+    import { initDoctorQueue, destroyDoctorQueue } from './js/doctor.js';
+    import { DEMO_MODE } from './js/config.js';
+
+    // ── Route guard ───────────────────────────────────────────
+    let currentUser;
+    try {
+      currentUser = await requireAuth('doctor');
+    } catch { /* requireAuth handles redirect */ }
+
+    // ── Demo banner ───────────────────────────────────────────
+    if (DEMO_MODE) document.getElementById('demo-banner').classList.remove('hidden');
+
+    // ── Populate header ───────────────────────────────────────
+    document.getElementById('header-user-name').textContent = currentUser.name;
+    document.getElementById('logout-btn').addEventListener('click', () => {
+      destroyDoctorQueue();
+      logout();
+    });
+
+    // ── Initialise real-time queue ────────────────────────────
+    await initDoctorQueue({ doctorId: currentUser.uid });
+
+    // Clean up listener when user leaves the page
+    window.addEventListener('beforeunload', destroyDoctorQueue);
+  </script>
+</body>
+</html>

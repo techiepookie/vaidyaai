@@ -12,7 +12,7 @@ WORKDIR /app
 COPY package.json package-lock.json* ./
 
 # Install production deps only (no devDependencies, no optional)
-RUN npm ci --omit=dev --omit=optional
+RUN npm install --omit=dev --omit=optional --prefer-offline
 
 # ── Stage 2: final runtime image ───────────────────────────────────
 FROM node:20-alpine AS runner
